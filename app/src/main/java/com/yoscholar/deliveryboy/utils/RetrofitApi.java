@@ -2,6 +2,7 @@ package com.yoscholar.deliveryboy.utils;
 
 
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
+import com.yoscholar.deliveryboy.retrofitPojo.normalOrders.NormalOrders;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +46,13 @@ public class RetrofitApi {
         Call<Login> login(
                 @Field("username") String username,
                 @Field("password") String password
+        );
+
+        @FormUrlEncoded
+        @POST("/agrimtool/android/deliveryBoyAPI.php?function=assignedOrders")
+        Call<NormalOrders> normalOrders(
+                @Field("db_name") String dbName,
+                @Field("token") String token
         );
 
     }

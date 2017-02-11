@@ -12,4 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <Button
+        android:id="@+id/open_maps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="Open maps"
+        android:visibility="gone"/>
+
+    <ListView
+        android:id="@+id/normal_orders_list_view"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="match_parent"/>
+
 </LinearLayout>
