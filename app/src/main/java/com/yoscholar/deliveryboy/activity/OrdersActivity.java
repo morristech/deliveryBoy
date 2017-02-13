@@ -6,12 +6,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.NormalOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.retrofitPojo.normalOrders.NormalOrders;
@@ -29,7 +33,7 @@ public class OrdersActivity extends AppCompatActivity {
     public static final String CUSTOMER_PHONE = "customer_phone";
     public static final String CUSTOMER_ADDRESS = "customer_address";
     public static final String CUSTOMER_PAYMENT_METHOD = "customer_payment_method";
-    public static final String CUSTOMER_TOTAL = "customer_payment_method";
+    public static final String CUSTOMER_TOTAL = "customer_total";
 
 
     private Toolbar toolbar;
@@ -83,8 +87,8 @@ public class OrdersActivity extends AppCompatActivity {
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
         Call<NormalOrders> normalOrdersCall = apiInterface.normalOrders(
-                AppPreference.getString(OrdersActivity.this, AppPreference.NAME),
-                AppPreference.getString(OrdersActivity.this, AppPreference.TOKEN)
+                AppPreference.getString(OrdersActivity.this, AppPreference.NAME),//db name
+                AppPreference.getString(OrdersActivity.this, AppPreference.TOKEN)//jwt token
         );
 
         normalOrdersCall.enqueue(new Callback<NormalOrders>() {
@@ -99,7 +103,9 @@ public class OrdersActivity extends AppCompatActivity {
                     displayNormalOrdersInListView(response.body());
 
                 } else {
+
                     Toast.makeText(OrdersActivity.this, "Some Error", Toast.LENGTH_SHORT).show();
+
                 }
 
             }
@@ -142,10 +148,65 @@ public class OrdersActivity extends AppCompatActivity {
 
         } else if (normalOrders.getStatus().equalsIgnoreCase("failure")) {
 
+            //show message
             Toast.makeText(OrdersActivity.this, normalOrders.getMessage(), Toast.LENGTH_SHORT).show();
 
+            //logout
+            AppPreference.clearPreferencesLogout(OrdersActivity.this);
+
+            openLoginScreen();
+
+            finish();
         }
 
     }
 
+    private void openLoginScreen() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_orders_activity, menu);
+
+        menu.findItem(R.id.settings).setIcon(new IconDrawable(this, FontAwesomeIcons.fa_gear)
+                .colorRes(android.R.color.white)
+                .actionBarSize());
+
+        menu.findItem(R.id.log_out).setIcon(new IconDrawable(this, FontAwesomeIcons.fa_sign_out)
+                .colorRes(android.R.color.white)
+                .actionBarSize());
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.log_out:
+
+                //logout
+                AppPreference.clearPreferencesLogout(OrdersActivity.this);
+
+                //open login screen
+                openLoginScreen();
+
+                return true;
+
+            case R.id.settings:
+
+                startActivity(new Intent(OrdersActivity.this, SettingsActivity.class));
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
 }

@@ -2,6 +2,7 @@
 <manifest package="com.yoscholar.deliveryboy"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
@@ -20,21 +21,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.OrdersActivity"
             android:label="Orders"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.OrderDetailsActivity"
             android:label="Order Details"
             android:screenOrientation="portrait"/>
-
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="Settings"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

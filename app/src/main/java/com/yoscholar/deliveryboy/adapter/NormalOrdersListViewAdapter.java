@@ -57,11 +57,8 @@ public class NormalOrdersListViewAdapter extends BaseAdapter {
                 normalOrders.getOrderdata().get(position).getCity() + ", " +
                 normalOrders.getOrderdata().get(position).getPincode());
 
-        TextView total = (TextView) convertView.findViewById(R.id.total);
-        if (normalOrders.getOrderdata().get(position).getTotal().equalsIgnoreCase("Prepaid"))
-            total.setText(normalOrders.getOrderdata().get(position).getTotal());
-        else
-            total.setText("Rs " + normalOrders.getOrderdata().get(position).getTotal());
+        TextView paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
+        paymentMethod.setText(normalOrders.getOrderdata().get(position).getMethod());
 
         return convertView;
     }
