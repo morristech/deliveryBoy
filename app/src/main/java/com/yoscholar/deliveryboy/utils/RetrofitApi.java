@@ -3,6 +3,7 @@ package com.yoscholar.deliveryboy.utils;
 
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
 import com.yoscholar.deliveryboy.retrofitPojo.normalOrders.NormalOrders;
+import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +18,7 @@ import retrofit2.http.POST;
 
 public class RetrofitApi {
 
-    public static String baseUrl = "http://devcloudpos.yoscholar.com";
+    public static String baseUrl = "http://staging1.schoolsaamaan.website";
     public static Retrofit retrofit;
 
     public static Retrofit getRetrofitInstance() {
@@ -49,11 +50,19 @@ public class RetrofitApi {
         );
 
         @FormUrlEncoded
-        @POST("/agrimtool/android/deliveryBoyAPI.php?function=assignedOrders")
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=assignedOrders")
         Call<NormalOrders> normalOrders(
                 @Field("db_name") String dbName,
                 @Field("token") String token
         );
 
+        @FormUrlEncoded
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=updateOrder")
+        Call<UpdateOrder> updateOrder(
+                @Field("order_id") String orderId,
+                @Field("status") String status,
+                @Field("db_name") String dbName,
+                @Field("token") String token
+        );
     }
 }

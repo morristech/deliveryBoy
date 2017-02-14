@@ -29,12 +29,13 @@ import retrofit2.Response;
 public class OrdersActivity extends AppCompatActivity {
 
     public static final String INCREMENT_ID = "increment_id";
+    public static final String ORDER_ID = "order_id";
     public static final String CUSTOMER_NAME = "customer_name";
     public static final String CUSTOMER_PHONE = "customer_phone";
     public static final String CUSTOMER_ADDRESS = "customer_address";
     public static final String CUSTOMER_PAYMENT_METHOD = "customer_payment_method";
     public static final String CUSTOMER_TOTAL = "customer_total";
-
+    private static final int MY_REQUEST_CODE = 200;
 
     private Toolbar toolbar;
     private Button openMapsButton;
@@ -135,13 +136,16 @@ public class OrdersActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     Intent intent = new Intent(OrdersActivity.this, OrderDetailsActivity.class);
+
                     intent.putExtra(INCREMENT_ID, normalOrders.getOrderdata().get(position).getIncrementId());
+                    intent.putExtra(ORDER_ID, normalOrders.getOrderdata().get(position).getOrderId());
                     intent.putExtra(CUSTOMER_NAME, normalOrders.getOrderdata().get(position).getCustomerName());
                     intent.putExtra(CUSTOMER_PHONE, normalOrders.getOrderdata().get(position).getPhone());
                     intent.putExtra(CUSTOMER_ADDRESS, normalOrders.getOrderdata().get(position).getAddress() + ", " + normalOrders.getOrderdata().get(position).getCity() + ", " + normalOrders.getOrderdata().get(position).getPincode());
                     intent.putExtra(CUSTOMER_PAYMENT_METHOD, normalOrders.getOrderdata().get(position).getMethod());
                     intent.putExtra(CUSTOMER_TOTAL, normalOrders.getOrderdata().get(position).getTotal());
-                    startActivity(intent);
+
+                    startActivityForResult(intent, MY_REQUEST_CODE);
 
                 }
             });
@@ -162,9 +166,12 @@ public class OrdersActivity extends AppCompatActivity {
     }
 
     private void openLoginScreen() {
+
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+
+        finish();
     }
 
     @Override
@@ -193,6 +200,8 @@ public class OrdersActivity extends AppCompatActivity {
                 //logout
                 AppPreference.clearPreferencesLogout(OrdersActivity.this);
 
+                Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show();
+
                 //open login screen
                 openLoginScreen();
 
@@ -208,5 +217,20 @@ public class OrdersActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == MY_REQUEST_CODE) {
+
+            if (resultCode == RESULT_OK) {
+
+                progressDialog.show();
+
+                makeNetworkRequest();
+            }
+        }
+
     }
 }

@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         versionTextView = (TextView) findViewById(R.id.version);
-        versionTextView.setText("version : " + BuildConfig.VERSION_NAME);
+        versionTextView.setText("Delivery Boy\nversion : " + BuildConfig.VERSION_NAME);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.yoscholar.deliveryboy.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -17,10 +19,20 @@ import android.widget.Toast;
 
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
+import com.yoscholar.deliveryboy.utils.AppPreference;
+import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class OrderDetailsActivity extends AppCompatActivity {
+
+    private static final String DELIVERED = "Delivered";
+    private static final String RE_DELIVER = "Re-Deliver";
 
     private Toolbar toolbar;
 
@@ -32,9 +44,11 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
     private IconButton routeLookUpButton;
     private IconButton callButton;
-    private IconButton deliveredSuccessfullyButton;
+    private IconButton deliverySuccessfulButton;
     private IconButton deliveryExceptionButton;
     private final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 100;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +65,12 @@ public class OrderDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getIntent().getStringExtra(OrdersActivity.INCREMENT_ID));
+
+        progressDialog = new ProgressDialog(OrderDetailsActivity.this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Please wait....");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
 
         orderId = (TextView) findViewById(R.id.increment_id);
         customerName = (TextView) findViewById(R.id.customer_name);
@@ -83,11 +103,13 @@ public class OrderDetailsActivity extends AppCompatActivity {
             }
         });
 
-        deliveredSuccessfullyButton = (IconButton) findViewById(R.id.delivered_successfully_button);
-        deliveredSuccessfullyButton.setOnClickListener(new View.OnClickListener() {
+        deliverySuccessfulButton = (IconButton) findViewById(R.id.delivered_successfully_button);
+        deliverySuccessfulButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(OrderDetailsActivity.this, "success", Toast.LENGTH_SHORT).show();
+
+                progressDialog.show();
+                updateOrder(DELIVERED);
             }
         });
 
@@ -95,9 +117,12 @@ public class OrderDetailsActivity extends AppCompatActivity {
         deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(OrderDetailsActivity.this, "failure", Toast.LENGTH_SHORT).show();
+
+                progressDialog.show();
+                updateOrder(RE_DELIVER);
             }
         });
+
 
     }
 
@@ -132,16 +157,12 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
+                    // permission was granted
                     makePhoneCall();
-
 
                 } else {
 
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // permission denied
                     Toast.makeText(this, "Permission Denied.", Toast.LENGTH_SHORT).show();
                 }
                 return;
@@ -171,6 +192,79 @@ public class OrderDetailsActivity extends AppCompatActivity {
         intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
 
         startActivity(intent);
+    }
+
+
+    private void updateOrder(String status) {
+
+        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
+
+        Call<UpdateOrder> updateOrderCall = apiInterface.updateOrder(
+                getIntent().getStringExtra(OrdersActivity.ORDER_ID),//order id
+                status,// Delivered / Re-Deliver
+                AppPreference.getString(OrderDetailsActivity.this, AppPreference.NAME),//db name
+                AppPreference.getString(OrderDetailsActivity.this, AppPreference.TOKEN)//jwt token
+        );
+
+        updateOrderCall.enqueue(new Callback<UpdateOrder>() {
+
+            @Override
+            public void onResponse(Call<UpdateOrder> call, Response<UpdateOrder> response) {
+
+                progressDialog.dismiss();
+
+                if (response.isSuccessful()) {
+
+                    checkTheResponseAndProceed(response.body());
+
+                } else {
+
+                    Toast.makeText(OrderDetailsActivity.this, "Some Error", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<UpdateOrder> call, Throwable t) {
+
+                progressDialog.dismiss();
+                Toast.makeText(OrderDetailsActivity.this, "Network problem", Toast.LENGTH_SHORT).show();
+                //Log.d("VICKY", call.request().url().toString());
+
+            }
+        });
+    }
+
+    private void checkTheResponseAndProceed(UpdateOrder updateOrder) {
+
+        if (updateOrder.getStatus().equalsIgnoreCase("success")) {
+
+            Toast.makeText(this, updateOrder.getMessage(), Toast.LENGTH_SHORT).show();
+            setResult(Activity.RESULT_OK);//set result OK
+            finish();// finish the activity
+
+        } else if (updateOrder.getStatus().equalsIgnoreCase("failure")) {
+
+            Toast.makeText(this, updateOrder.getMessage(), Toast.LENGTH_SHORT).show();
+
+            //logout
+            AppPreference.clearPreferencesLogout(OrderDetailsActivity.this);
+
+            //open login screen
+            openLoginScreen();
+
+        }
+
+    }
+
+    private void openLoginScreen() {
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+        finish();// finish the current activity
     }
 
     @Override
