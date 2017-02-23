@@ -38,7 +38,6 @@ public class OrdersActivity extends AppCompatActivity {
     private static final int MY_REQUEST_CODE = 200;
 
     private Toolbar toolbar;
-    private Button openMapsButton;
     private ListView normalOrdersListView;
     private ProgressDialog progressDialog;
 
@@ -58,19 +57,6 @@ public class OrdersActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        openMapsButton = (Button) findViewById(R.id.open_maps);
-        openMapsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode("129, 18th Cross Road, Rajiv Gandhi Nagar, HSR Layout, Bengaluru, Karnataka"));
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
-
-            }
-        });
 
         normalOrdersListView = (ListView) findViewById(R.id.normal_orders_list_view);
 

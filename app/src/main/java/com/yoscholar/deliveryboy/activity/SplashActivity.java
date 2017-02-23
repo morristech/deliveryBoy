@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
 
                 if (AppPreference.getBoolean(SplashActivity.this, AppPreference.IS_LOGGED_IN))
-                    startActivity(new Intent(SplashActivity.this, OrdersActivity.class));
+                    startActivity(new Intent(SplashActivity.this, OptionsActivity.class));
                 else
                     startActivity(new Intent(SplashActivity.this, LoginActivity.class));
 

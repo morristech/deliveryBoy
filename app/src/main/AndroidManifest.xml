@@ -36,6 +36,18 @@
             android:name=".activity.SettingsActivity"
             android:label="Settings"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.OptionsActivity"
+            android:label="Select an option"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.AcceptOrdersActivity"
+            android:label="Accept Orders"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.DeliverOrdersActivity"
+            android:label="Deliver Orders"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
