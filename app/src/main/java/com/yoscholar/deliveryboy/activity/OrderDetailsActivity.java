@@ -64,7 +64,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getIntent().getStringExtra(OrdersActivity.INCREMENT_ID));
+        getSupportActionBar().setTitle(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
 
         progressDialog = new ProgressDialog(OrderDetailsActivity.this);
         progressDialog.setIndeterminate(true);
@@ -78,11 +78,11 @@ public class OrderDetailsActivity extends AppCompatActivity {
         payMode = (TextView) findViewById(R.id.customer_payment_method);
         total = (TextView) findViewById(R.id.customer_total);
 
-        orderId.setText(getIntent().getStringExtra(OrdersActivity.INCREMENT_ID));
-        customerName.setText(getIntent().getStringExtra(OrdersActivity.CUSTOMER_NAME));
-        address.setText(getIntent().getStringExtra(OrdersActivity.CUSTOMER_ADDRESS));
-        payMode.setText(getIntent().getStringExtra(OrdersActivity.CUSTOMER_PAYMENT_METHOD));
-        total.setText(getIntent().getStringExtra(OrdersActivity.CUSTOMER_TOTAL));
+        orderId.setText(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+        customerName.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_NAME));
+        address.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS));
+        payMode.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD));
+        total.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_TOTAL));
 
         routeLookUpButton = (IconButton) findViewById(R.id.route_lookup_button);
         routeLookUpButton.setOnClickListener(new View.OnClickListener() {
@@ -173,7 +173,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
     private void makePhoneCall() {
 
-        String uri = "tel:" + getIntent().getStringExtra(OrdersActivity.CUSTOMER_PHONE);
+        String uri = "tel:" + getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PHONE);
         Intent intent = new Intent(Intent.ACTION_CALL);
         intent.setData(Uri.parse(uri));
         startActivity(intent);
@@ -185,7 +185,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         String uri = String.format(
                 Locale.ENGLISH,
                 "http://maps.google.com/maps?daddr=%s",
-                getIntent().getStringExtra(OrdersActivity.CUSTOMER_ADDRESS));
+                getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS));
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
 
@@ -200,7 +200,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
         Call<UpdateOrder> updateOrderCall = apiInterface.updateOrder(
-                getIntent().getStringExtra(OrdersActivity.ORDER_ID),//order id
+                getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID),//order id
                 status,// Delivered / Re-Deliver
                 AppPreference.getString(OrderDetailsActivity.this, AppPreference.NAME),//db name
                 AppPreference.getString(OrderDetailsActivity.this, AppPreference.TOKEN)//jwt token

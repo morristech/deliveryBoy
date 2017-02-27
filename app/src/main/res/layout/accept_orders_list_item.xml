@@ -28,6 +28,16 @@
             android:text="@string/accept"
             android:textColor="@android:color/white"/>
 
+        <TextView
+            android:id="@+id/accepted_text_view"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="ACCEPTED"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="18sp"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
 </LinearLayout>

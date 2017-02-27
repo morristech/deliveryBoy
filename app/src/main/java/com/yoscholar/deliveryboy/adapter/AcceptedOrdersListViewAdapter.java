@@ -8,25 +8,27 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.yoscholar.deliveryboy.R;
-import com.yoscholar.deliveryboy.retrofitPojo.normalOrders.NormalOrders;
+import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+
+import java.util.ArrayList;
 
 /**
- * Created by agrim on 11/2/17.
+ * Created by agrim on 27/2/17.
  */
 
-public class NormalOrdersListViewAdapter extends BaseAdapter {
+public class AcceptedOrdersListViewAdapter extends BaseAdapter {
 
     private Context context;
-    private NormalOrders normalOrders;
+    private ArrayList<Orderdatum> orderdatumArrayList;
 
-    public NormalOrdersListViewAdapter(Context context, NormalOrders normalOrders) {
+    public AcceptedOrdersListViewAdapter(Context context, ArrayList<Orderdatum> orderdatumArrayList) {
         this.context = context;
-        this.normalOrders = normalOrders;
+        this.orderdatumArrayList = orderdatumArrayList;
     }
 
     @Override
     public int getCount() {
-        return normalOrders.getOrderdata().size();
+        return orderdatumArrayList.size();
     }
 
     @Override
@@ -45,20 +47,20 @@ public class NormalOrdersListViewAdapter extends BaseAdapter {
         if (convertView == null) {
 
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.normal_orders_list_item, parent, false);
+            convertView = inflater.inflate(R.layout.accepted_orders_list_item, parent, false);
 
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText("#" + normalOrders.getOrderdata().get(position).getIncrementId());
+        incrementId.setText("#" + orderdatumArrayList.get(position).getIncrementId());
 
         TextView address = (TextView) convertView.findViewById(R.id.address);
-        address.setText(normalOrders.getOrderdata().get(position).getAddress() + ",\n" +
-                normalOrders.getOrderdata().get(position).getCity() + ", " +
-                normalOrders.getOrderdata().get(position).getPincode());
+        address.setText(orderdatumArrayList.get(position).getAddress() + ",\n" +
+                orderdatumArrayList.get(position).getCity() + ", " +
+                orderdatumArrayList.get(position).getPincode());
 
         TextView paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
-        paymentMethod.setText(normalOrders.getOrderdata().get(position).getMethod());
+        paymentMethod.setText(orderdatumArrayList.get(position).getMethod());
 
         return convertView;
     }

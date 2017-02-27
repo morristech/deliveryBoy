@@ -3,7 +3,6 @@ package com.yoscholar.deliveryboy.utils;
 
 import com.yoscholar.deliveryboy.retrofitPojo.acceptAnOrder.AcceptOrder;
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
-import com.yoscholar.deliveryboy.retrofitPojo.normalOrders.NormalOrders;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
 import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 
@@ -66,16 +65,9 @@ public class RetrofitApi {
         );
 
         @FormUrlEncoded
-        @POST("agrimtool/android/deliveryBoyAPI.php?function=assignedOrders")
-        Call<NormalOrders> normalOrders(
-                @Field("db_name") String dbName,
-                @Field("token") String token
-        );
-
-        @FormUrlEncoded
         @POST("agrimtool/android/deliveryBoyAPI.php?function=updateOrder")
         Call<UpdateOrder> updateOrder(
-                @Field("order_id") String orderId,
+                @Field("order_ship_id") String orderId,
                 @Field("status") String status,
                 @Field("db_name") String dbName,
                 @Field("token") String token

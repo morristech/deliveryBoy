@@ -12,9 +12,14 @@ import android.widget.Toast;
 
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.AcceptOrdersListViewAdapter;
+import com.yoscholar.deliveryboy.pojo.OrderAccepted;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,7 +41,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
         init();
 
-        makeNetworkRequest();
+        getOrdersToAccept();
     }
 
     private void init() {
@@ -55,7 +60,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
-    private void makeNetworkRequest() {
+    private void getOrdersToAccept() {
 
         Log.d(TAG, "Requesting");
 
@@ -102,7 +107,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
             Toast.makeText(AcceptOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
 
-            AcceptOrdersListViewAdapter acceptOrdersListViewAdapter = new AcceptOrdersListViewAdapter(AcceptOrdersActivity.this, acceptOrders);
+            acceptOrdersListViewAdapter = new AcceptOrdersListViewAdapter(AcceptOrdersActivity.this, acceptOrders);
 
             acceptOrdersListView.setAdapter(acceptOrdersListViewAdapter);
 
@@ -127,7 +132,6 @@ public class AcceptOrdersActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
-        finish();
     }
 
     @Override
@@ -142,6 +146,39 @@ public class AcceptOrdersActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onOrderAccepted(OrderAccepted orderAccepted) {
+
+        if (orderAccepted.isAccepted()) {
+
+            progressDialog.show();
+
+            getOrdersToAccept();
+
+        } else {
+
+            //logout
+            AppPreference.clearPreferencesLogout(AcceptOrdersActivity.this);
+
+            //open login screen
+            openLoginScreen();
+
+            finish();
         }
     }
 }

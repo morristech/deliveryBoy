@@ -25,10 +25,6 @@
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.OrdersActivity"
-            android:label="Orders"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".activity.OrderDetailsActivity"
             android:label="Order Details"
             android:screenOrientation="portrait"/>
