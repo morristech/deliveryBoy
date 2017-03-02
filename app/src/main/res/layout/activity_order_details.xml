@@ -3,7 +3,7 @@
     android:id="@+id/activity_order_details"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <include
@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"/>
 
     <LinearLayout
+        android:id="@+id/order_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -171,6 +172,106 @@
                 android:textColor="@android:color/white"
                 android:textSize="15sp"/>
 
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/exception_reason_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Select a reason : "
+            android:textColor="@android:color/black"
+            android:textSize="20sp"/>
+
+        <RadioGroup
+            android:id="@+id/delivery_exception_radio_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp">
+
+            <RadioButton
+                android:id="@+id/door_locked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/door_locked"
+                android:textSize="17sp"/>
+
+            <RadioButton
+                android:id="@+id/future_delivery_requested"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/future_delivery_requested"
+                android:textSize="17sp"/>
+
+            <RadioButton
+                android:id="@+id/unable_to_collect_cash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unable_to_collect_cash"
+                android:textSize="17sp"/>
+
+            <RadioButton
+                android:id="@+id/customer_not_accepting_package"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/customer_not_accepting_package"
+                android:textSize="17sp"/>
+
+            <RadioButton
+                android:id="@+id/unable_to_go"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unable_to_go"
+                android:textSize="17sp"/>
+
+            <RadioButton
+                android:id="@+id/other"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/other"
+                android:textSize="17sp"/>
+
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/other_reason_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="Enter here"
+            android:inputType="text"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/ok_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ok"/>
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/cancel"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

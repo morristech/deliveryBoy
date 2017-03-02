@@ -6,4 +6,12 @@
     <string name="logout">Logout</string>
     <string name="settings">Settings</string>
     <string name="accept">ACCEPT</string>
+    <string name="door_locked">Door Locked</string>
+    <string name="future_delivery_requested">Future delivery requested</string>
+    <string name="unable_to_collect_cash">Unable to collect cash</string>
+    <string name="customer_not_accepting_package">Customer not accepting package</string>
+    <string name="unable_to_go">Unable to go</string>
+    <string name="other">Other</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

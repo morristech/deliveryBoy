@@ -19,7 +19,7 @@ import retrofit2.http.POST;
 
 public class RetrofitApi {
 
-    public static String baseUrl = "http://devcloudpos.yoscholar.com";
+    public static String baseUrl = "http://staging1.schoolsaamaan.website";
     public static Retrofit retrofit;
 
     public static Retrofit getRetrofitInstance() {
@@ -67,7 +67,9 @@ public class RetrofitApi {
         @FormUrlEncoded
         @POST("agrimtool/android/deliveryBoyAPI.php?function=updateOrder")
         Call<UpdateOrder> updateOrder(
-                @Field("order_ship_id") String orderId,
+                @Field("increment_id") String orderId,
+                @Field("comment") String comment,
+                @Field("order_ship_id") String orderShipId,
                 @Field("status") String status,
                 @Field("db_name") String dbName,
                 @Field("token") String token

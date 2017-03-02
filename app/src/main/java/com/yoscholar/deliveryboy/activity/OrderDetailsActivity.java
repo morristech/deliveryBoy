@@ -12,8 +12,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +56,14 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private LinearLayout orderContainer;
+    private LinearLayout exceptionReasonContainer;
+
+    private RadioGroup deliveryExceptionRadioGroup;
+    private EditText otherReasonEditText;
+    private Button okButton;
+    private Button cancelButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +79,9 @@ public class OrderDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+
+        orderContainer = (LinearLayout) findViewById(R.id.order_container);
+        exceptionReasonContainer = (LinearLayout) findViewById(R.id.exception_reason_container);
 
         progressDialog = new ProgressDialog(OrderDetailsActivity.this);
         progressDialog.setIndeterminate(true);
@@ -83,6 +100,102 @@ public class OrderDetailsActivity extends AppCompatActivity {
         address.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS));
         payMode.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD));
         total.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_TOTAL));
+
+        otherReasonEditText = (EditText) findViewById(R.id.other_reason_edit_text);
+
+        deliveryExceptionRadioGroup = (RadioGroup) findViewById(R.id.delivery_exception_radio_group);
+        deliveryExceptionRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                switch (checkedId) {
+                    case R.id.door_locked:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.GONE);
+                        break;
+
+                    case R.id.future_delivery_requested:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.VISIBLE);
+                        break;
+
+                    case R.id.unable_to_collect_cash:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.GONE);
+                        break;
+
+                    case R.id.customer_not_accepting_package:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.GONE);
+                        break;
+
+                    case R.id.unable_to_go:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.GONE);
+                        break;
+
+                    case R.id.other:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.VISIBLE);
+                        break;
+
+                    default:
+                        otherReasonEditText.setText("");
+                        otherReasonEditText.setVisibility(View.GONE);
+                        break;
+                }
+            }
+        });
+
+
+        okButton = (Button) findViewById(R.id.ok_button);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                RadioButton checkedRadioButton = (RadioButton) findViewById(deliveryExceptionRadioGroup.getCheckedRadioButtonId());
+
+                String reason;
+
+                if (!TextUtils.isEmpty(otherReasonEditText.getText().toString()))
+                    reason = checkedRadioButton.getText().toString() + " : " + otherReasonEditText.getText().toString();
+                else
+                    reason = checkedRadioButton.getText().toString();
+
+                if (deliveryExceptionRadioGroup.getCheckedRadioButtonId() == R.id.future_delivery_requested ||
+                        deliveryExceptionRadioGroup.getCheckedRadioButtonId() == R.id.other) {
+
+                    if (TextUtils.isEmpty(otherReasonEditText.getText().toString())) {
+
+                        otherReasonEditText.setError("Please fill this field.");
+
+                    } else {
+
+                        Toast.makeText(OrderDetailsActivity.this, "Reason : " + reason, Toast.LENGTH_SHORT).show();
+                        progressDialog.show();
+                        updateOrder(RE_DELIVER, reason);
+                    }
+
+                } else {
+
+                    Toast.makeText(OrderDetailsActivity.this, "Reason : " + reason, Toast.LENGTH_SHORT).show();
+                    progressDialog.show();
+                    updateOrder(RE_DELIVER, reason);
+
+                }
+
+            }
+        });
+
+        cancelButton = (Button) findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                orderContainer.setVisibility(View.VISIBLE);
+                exceptionReasonContainer.setVisibility(View.GONE);
+            }
+        });
 
         routeLookUpButton = (IconButton) findViewById(R.id.route_lookup_button);
         routeLookUpButton.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +222,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 progressDialog.show();
-                updateOrder(DELIVERED);
+                updateOrder(DELIVERED, "");
             }
         });
 
@@ -118,8 +231,8 @@ public class OrderDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                progressDialog.show();
-                updateOrder(RE_DELIVER);
+                orderContainer.setVisibility(View.GONE);
+                exceptionReasonContainer.setVisibility(View.VISIBLE);
             }
         });
 
@@ -194,13 +307,14 @@ public class OrderDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-    private void updateOrder(String status) {
+    private void updateOrder(String status, String comment) {
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
         Call<UpdateOrder> updateOrderCall = apiInterface.updateOrder(
-                getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID),//order id
+                getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID),//increment id
+                comment,//comment
+                getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID),//order ship id
                 status,// Delivered / Re-Deliver
                 AppPreference.getString(OrderDetailsActivity.this, AppPreference.NAME),//db name
                 AppPreference.getString(OrderDetailsActivity.this, AppPreference.TOKEN)//jwt token
@@ -254,6 +368,8 @@ public class OrderDetailsActivity extends AppCompatActivity {
             //open login screen
             openLoginScreen();
 
+            finish();// finish the current activity
+
         }
 
     }
@@ -264,7 +380,6 @@ public class OrderDetailsActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
-        finish();// finish the current activity
     }
 
     @Override
