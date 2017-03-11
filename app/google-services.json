@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "545023501152",
+    "firebase_url": "https://cloudpos-9a9b1.firebaseio.com",
+    "project_id": "cloudpos-9a9b1",
+    "storage_bucket": "cloudpos-9a9b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545023501152:android:81fdfcf0da36eb84",
+        "android_client_info": {
+          "package_name": "com.yoscholar.pos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545023501152-irp7hrsqg5a5boclet5resvna0508g2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_EYZelCLgIhIBAIUjOS34V5KRR9xYdtk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545023501152:android:28212f10453652b2",
+        "android_client_info": {
+          "package_name": "com.yoscholar.deliveryboy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545023501152-irp7hrsqg5a5boclet5resvna0508g2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_EYZelCLgIhIBAIUjOS34V5KRR9xYdtk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

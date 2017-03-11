@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 25
@@ -8,7 +9,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
-        versionName "staging1_1.1"
+        versionName "YoScholar Delivery 1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -25,7 +26,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.1.1'
+
+    compile 'com.google.firebase:firebase-crash:10.2.0'
+    compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
     compile 'com.mobsandgeeks:android-saripaar:2.0.3'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
