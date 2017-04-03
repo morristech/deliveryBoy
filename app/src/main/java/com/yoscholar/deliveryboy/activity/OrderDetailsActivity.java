@@ -3,6 +3,7 @@ package com.yoscholar.deliveryboy.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -221,8 +223,23 @@ public class OrderDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                progressDialog.show();
-                updateOrder(DELIVERED, "");
+                new AlertDialog.Builder(OrderDetailsActivity.this)
+                        .setMessage("Are you sure?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                progressDialog.show();
+                                updateOrder(DELIVERED, "");
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+
             }
         });
 
@@ -235,7 +252,6 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 exceptionReasonContainer.setVisibility(View.VISIBLE);
             }
         });
-
 
     }
 

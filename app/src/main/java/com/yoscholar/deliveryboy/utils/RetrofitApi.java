@@ -19,7 +19,7 @@ import retrofit2.http.POST;
 
 public class RetrofitApi {
 
-    public static String baseUrl = "https://www.yoscholar.com";
+    public static String baseUrl = "http://staging1.schoolsaamaan.website";
     public static Retrofit retrofit;
 
     public static Retrofit getRetrofitInstance() {
