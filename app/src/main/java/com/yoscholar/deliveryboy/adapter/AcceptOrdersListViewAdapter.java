@@ -10,10 +10,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Database;
+import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.pojo.OrderAccepted;
 import com.yoscholar.deliveryboy.retrofitPojo.acceptAnOrder.AcceptOrder;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
+import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
@@ -73,7 +77,7 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
         Button acceptButton = (Button) convertView.findViewById(R.id.accept_button);
 
-        TextView acceptedTextView = (TextView) convertView.findViewById(R.id.accepted_text_view);
+        IconButton acceptedButton = (IconButton) convertView.findViewById(R.id.accepted_button);
 
         if (acceptOrders.getOrderdata().get(position).getAcceptStatus() == 0) {
 
@@ -83,23 +87,23 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
                 public void onClick(View v) {
 
                     Toast.makeText(context, "Position : " + position, Toast.LENGTH_SHORT).show();
-                    acceptAnOrder(acceptOrders.getOrderdata().get(position).getOrdershipid());
+                    acceptAnOrder(acceptOrders.getOrderdata().get(position).getOrdershipid(), acceptOrders.getOrderdata().get(position));
                 }
             });
 
-            acceptedTextView.setVisibility(View.GONE);
+            acceptedButton.setVisibility(View.GONE);
 
         } else {
 
             acceptButton.setVisibility(View.GONE);
-            acceptedTextView.setVisibility(View.VISIBLE);
+            acceptedButton.setVisibility(View.VISIBLE);
 
         }
 
         return convertView;
     }
 
-    private void acceptAnOrder(String orderShipId) {
+    private void acceptAnOrder(String orderShipId, final Orderdatum orderdatum) {
 
         progressDialog.show();
 
@@ -123,6 +127,10 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
 
+                        //save the accepted order in DB
+                        saveTheAcceptedOrderInDb(orderdatum);
+
+                        //reload the list of orders to accept
                         EventBus.getDefault().post(new OrderAccepted(true));
 
                     } else if (response.body().getStatus().equalsIgnoreCase("failure")) {
@@ -151,6 +159,12 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
             }
         });
+    }
+
+    private void saveTheAcceptedOrderInDb(Orderdatum orderdatum) {
+
+        Database database = CouchBaseHelper.openCouchBaseDB(context);
+        CouchBaseHelper.saveAcceptedOrderInDB(database, orderdatum);
     }
 
 

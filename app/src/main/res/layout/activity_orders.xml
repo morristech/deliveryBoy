@@ -15,7 +15,10 @@
     <ListView
         android:id="@+id/normal_orders_list_view"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_margin="10dp"
-        android:layout_height="match_parent"/>
+        android:divider="@android:color/transparent"
+        android:dividerHeight="20dp"
+        android:scrollbars="none"/>
 
 </LinearLayout>

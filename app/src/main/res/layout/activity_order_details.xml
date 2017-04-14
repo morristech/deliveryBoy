@@ -3,7 +3,7 @@
     android:id="@+id/activity_order_details"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <include
@@ -12,266 +12,346 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <LinearLayout
-        android:id="@+id/order_container"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/colorPrimary"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="100dp"
+            android:background="@color/colorAccent"/>
+
+        <ScrollView
+            android:id="@+id/order_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
+            android:padding="20dp"
+            android:scrollbars="none"
+            android:visibility="visible">
 
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="Order Id    : "
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/increment_id"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="Name        : "
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/customer_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="Address    : "
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/customer_address"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"/>
+                android:background="@android:color/white"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="25dp"
+                    android:text="Order Details"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="Order ID"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/increment_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="#100008736"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorAccent"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Customer Name"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/customer_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="Vipin Kumar"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorAccent"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Address"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/customer_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="129/4, 4th Main, 18th Cross, Rajivgandhi Nagar, HSR, 560068"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorAccent"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Pay Mode"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/customer_payment_method"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="Prepaid"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorAccent"/>
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Total"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/customer_total"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="Prepaid"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorAccent"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:layout_marginTop="25dp">
+
+                    <Button
+                        android:id="@+id/delivered_successfully_button"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="25dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/black"
+                        android:text="Success"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"/>
+
+                    <Button
+                        android:id="@+id/delivery_exception_button"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="25dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/black"
+                        android:text="Failed"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
 
         <LinearLayout
+            android:id="@+id/exception_reason_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
+            android:layout_margin="20dp"
+            android:background="@android:color/white"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="Pay Mode : "
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/customer_payment_method"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="15sp"
+                android:layout_marginLeft="25sp"
+                android:layout_marginTop="25sp"
+                android:text="Select a reason : "
                 android:textColor="@android:color/black"
-                android:textSize="15sp"/>
+                android:textSize="20sp"
+                android:textStyle="bold"/>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="Total(INR) : "
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/customer_total"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp">
-
-            <com.joanzapata.iconify.widget.IconButton
-                android:id="@+id/call_button"
-                android:layout_width="150dp"
-                android:layout_height="70dp"
-                android:text="{fa-phone 30sp @color/colorPrimary} CALL"/>
-
-            <com.joanzapata.iconify.widget.IconButton
-                android:id="@+id/route_lookup_button"
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_weight="1"
-                android:text="{fa-map-marker 30sp @color/colorPrimary} ROUTE LOOKUP"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.joanzapata.iconify.widget.IconButton
-                android:id="@+id/delivered_successfully_button"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_marginRight="10dp"
-                android:background="@android:color/holo_green_dark"
-                android:gravity="center"
-                android:text="{fa-check 40sp}\n\nDelivery Successful"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"/>
-
-            <com.joanzapata.iconify.widget.IconButton
-                android:id="@+id/delivery_exception_button"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_height="1dp"
                 android:layout_marginLeft="10dp"
-                android:background="@android:color/holo_red_dark"
+                android:layout_marginRight="10dp"
+                android:background="@color/colorAccent"/>
+
+
+            <RadioGroup
+                android:id="@+id/delivery_exception_radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25sp"
+                android:layout_marginTop="10dp">
+
+                <RadioButton
+                    android:id="@+id/door_locked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/door_locked"
+                    android:textSize="17sp"/>
+
+                <RadioButton
+                    android:id="@+id/future_delivery_requested"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/future_delivery_requested"
+                    android:textSize="17sp"/>
+
+                <RadioButton
+                    android:id="@+id/unable_to_collect_cash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unable_to_collect_cash"
+                    android:textSize="17sp"/>
+
+                <RadioButton
+                    android:id="@+id/customer_not_accepting_package"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/customer_not_accepting_package"
+                    android:textSize="17sp"/>
+
+                <RadioButton
+                    android:id="@+id/unable_to_go"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unable_to_go"
+                    android:textSize="17sp"/>
+
+                <RadioButton
+                    android:id="@+id/other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/other"
+                    android:textSize="17sp"/>
+
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/other_reason_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Enter here"
+                android:layout_marginTop="20sp"
+                android:inputType="text"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25sp"
+                android:layout_marginTop="25sp"
                 android:gravity="center"
-                android:text="{fa-remove 40sp}\n\nDelivery Exception"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"/>
+                android:orientation="horizontal">
 
+                <Button
+                    android:id="@+id/ok_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25sp"
+                    android:layout_marginRight="5sp"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:text="@string/ok"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5sp"
+                    android:layout_marginRight="25sp"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:text="@string/cancel"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+            </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/exception_reason_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Select a reason : "
-            android:textColor="@android:color/black"
-            android:textSize="20sp"/>
-
-        <RadioGroup
-            android:id="@+id/delivery_exception_radio_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp">
-
-            <RadioButton
-                android:id="@+id/door_locked"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/door_locked"
-                android:textSize="17sp"/>
-
-            <RadioButton
-                android:id="@+id/future_delivery_requested"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/future_delivery_requested"
-                android:textSize="17sp"/>
-
-            <RadioButton
-                android:id="@+id/unable_to_collect_cash"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/unable_to_collect_cash"
-                android:textSize="17sp"/>
-
-            <RadioButton
-                android:id="@+id/customer_not_accepting_package"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/customer_not_accepting_package"
-                android:textSize="17sp"/>
-
-            <RadioButton
-                android:id="@+id/unable_to_go"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/unable_to_go"
-                android:textSize="17sp"/>
-
-            <RadioButton
-                android:id="@+id/other"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/other"
-                android:textSize="17sp"/>
-
-        </RadioGroup>
-
-        <EditText
-            android:id="@+id/other_reason_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="Enter here"
-            android:inputType="text"
-            android:visibility="gone"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/ok_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ok"/>
-
-            <Button
-                android:id="@+id/cancel_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/cancel"/>
-        </LinearLayout>
-    </LinearLayout>
 </LinearLayout>

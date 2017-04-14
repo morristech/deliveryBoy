@@ -1,6 +1,5 @@
 package com.yoscholar.deliveryboy.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,18 +10,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Database;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.AcceptedOrdersListViewAdapter;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
-import com.yoscholar.deliveryboy.utils.AppPreference;
-import com.yoscholar.deliveryboy.utils.RetrofitApi;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class DeliverOrdersActivity extends AppCompatActivity {
 
@@ -38,7 +38,6 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private ListView normalOrdersListView;
-    private ProgressDialog progressDialog;
 
     private ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
 
@@ -50,7 +49,7 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
         init();
 
-        makeNetworkRequest();
+        //makeNetworkRequest();
 
     }
 
@@ -62,15 +61,22 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
         normalOrdersListView = (ListView) findViewById(R.id.normal_orders_list_view);
 
-        progressDialog = new ProgressDialog(DeliverOrdersActivity.this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Please wait....");
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
+        Database database = CouchBaseHelper.openCouchBaseDB(DeliverOrdersActivity.this);
 
+        orderdatumArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
+
+        Collections.sort(orderdatumArrayList, new Comparator<Orderdatum>() {
+            @Override
+            public int compare(Orderdatum o1, Orderdatum o2) {
+
+                return o1.getIncrementId().compareTo(o2.getIncrementId());
+            }
+        });
+
+        displayAcceptedOrdersInListView();
     }
 
+/*
     private void makeNetworkRequest() {
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
@@ -109,58 +115,32 @@ public class DeliverOrdersActivity extends AppCompatActivity {
             }
         });
     }
+*/
 
-    private void displayAcceptedOrdersInListView(AcceptOrders acceptOrders) {
+    private void displayAcceptedOrdersInListView() {
 
-        if (acceptOrders.getStatus().equalsIgnoreCase("success")) {
+        AcceptedOrdersListViewAdapter acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderdatumArrayList);
 
-            Toast.makeText(DeliverOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
+        normalOrdersListView.setAdapter(acceptedOrdersListViewAdapter);
+        normalOrdersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            orderdatumArrayList = new ArrayList<>();
+                Intent intent = new Intent(DeliverOrdersActivity.this, OrderDetailsActivity.class);
 
-            //get only those orders where accept_status = 1
-            for (int i = 0; i < acceptOrders.getOrderdata().size(); ++i) {
+                intent.putExtra(INCREMENT_ID, orderdatumArrayList.get(position).getIncrementId());
+                intent.putExtra(ORDER_ID, orderdatumArrayList.get(position).getOrderId());
+                intent.putExtra(CUSTOMER_NAME, orderdatumArrayList.get(position).getCustomerName());
+                intent.putExtra(CUSTOMER_PHONE, orderdatumArrayList.get(position).getPhone());
+                intent.putExtra(CUSTOMER_ADDRESS, orderdatumArrayList.get(position).getAddress() + ", " + orderdatumArrayList.get(position).getCity() + ", " + orderdatumArrayList.get(position).getPincode());
+                intent.putExtra(CUSTOMER_PAYMENT_METHOD, orderdatumArrayList.get(position).getMethod());
+                intent.putExtra(CUSTOMER_TOTAL, orderdatumArrayList.get(position).getTotal());
+                intent.putExtra(ORDER_SHIP_ID, orderdatumArrayList.get(position).getOrdershipid());
 
-                if (acceptOrders.getOrderdata().get(i).getAcceptStatus() == 1)
-                    orderdatumArrayList.add(acceptOrders.getOrderdata().get(i));
+                startActivityForResult(intent, MY_REQUEST_CODE);
 
             }
-
-            AcceptedOrdersListViewAdapter acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderdatumArrayList);
-
-            normalOrdersListView.setAdapter(acceptedOrdersListViewAdapter);
-            normalOrdersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    Intent intent = new Intent(DeliverOrdersActivity.this, OrderDetailsActivity.class);
-
-                    intent.putExtra(INCREMENT_ID, orderdatumArrayList.get(position).getIncrementId());
-                    intent.putExtra(ORDER_ID, orderdatumArrayList.get(position).getOrderId());
-                    intent.putExtra(CUSTOMER_NAME, orderdatumArrayList.get(position).getCustomerName());
-                    intent.putExtra(CUSTOMER_PHONE, orderdatumArrayList.get(position).getPhone());
-                    intent.putExtra(CUSTOMER_ADDRESS, orderdatumArrayList.get(position).getAddress() + ", " + orderdatumArrayList.get(position).getCity() + ", " + orderdatumArrayList.get(position).getPincode());
-                    intent.putExtra(CUSTOMER_PAYMENT_METHOD, orderdatumArrayList.get(position).getMethod());
-                    intent.putExtra(CUSTOMER_TOTAL, orderdatumArrayList.get(position).getTotal());
-                    intent.putExtra(ORDER_SHIP_ID, orderdatumArrayList.get(position).getOrdershipid());
-
-                    startActivityForResult(intent, MY_REQUEST_CODE);
-
-                }
-            });
-
-        } else if (acceptOrders.getStatus().equalsIgnoreCase("failure")) {
-
-            //show message
-            Toast.makeText(DeliverOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
-
-            //logout
-            AppPreference.clearPreferencesLogout(DeliverOrdersActivity.this);
-
-            openLoginScreen();
-
-            finish();
-        }
+        });
 
     }
 
@@ -194,12 +174,44 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
 
-                progressDialog.show();
-
-                makeNetworkRequest();
+                Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
             }
         }
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBackGroundOrdersSyncFinished(Orderdatum orderdatum) {
+
+        goToOrderDetailsActivity(orderdatum);
+    }
+
+    private void goToOrderDetailsActivity(Orderdatum orderdatum) {
+        Intent intent = new Intent(DeliverOrdersActivity.this, OrderDetailsActivity.class);
+
+        intent.putExtra(DeliverOrdersActivity.INCREMENT_ID, orderdatum.getIncrementId());
+        intent.putExtra(DeliverOrdersActivity.ORDER_ID, orderdatum.getOrderId());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_NAME, orderdatum.getCustomerName());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PHONE, orderdatum.getPhone());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS, orderdatum.getAddress() + ", " + orderdatum.getCity() + ", " + orderdatum.getPincode());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD, orderdatum.getMethod());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_TOTAL, orderdatum.getTotal());
+        intent.putExtra(DeliverOrdersActivity.ORDER_SHIP_ID, orderdatum.getOrdershipid());
+
+        startActivityForResult(intent, MY_REQUEST_CODE);
+
+    }
 }

@@ -16,6 +16,9 @@
         android:id="@+id/orders_list_to_accept"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="20dp"
+        android:scrollbars="none"/>
 
 </LinearLayout>

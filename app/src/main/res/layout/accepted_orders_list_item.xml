@@ -4,48 +4,116 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="1dp"
+        android:background="@color/colorAccent"/>
 
-        <TextView
-            android:id="@+id/increment_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="#100005789"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"/>
-
-        <TextView
-            android:id="@+id/payment_method"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="COD"
-            android:textColor="@color/colorPrimary"
-            android:textSize="20sp"/>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/increment_id"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="120dp"
         android:orientation="horizontal">
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"/>
 
         <com.joanzapata.iconify.widget.IconTextView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:id="@+id/route"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_gravity="center"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/circle"
             android:gravity="center"
             android:text="{fa-map-marker}"
             android:textColor="@color/colorPrimary"
             android:textSize="30sp"/>
 
-        <TextView
-            android:id="@+id/address"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/customer_name"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@android:color/black"
+                android:textSize="17sp"/>
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:textColor="@color/colorAccent"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/call"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="{fa-phone 30sp @android:color/white}"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"/>
+
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/message"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="{fa-envelope 30sp @android:color/white}"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"/>
+
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/deliver"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="{fa-truck 30sp @android:color/white}"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"/>
 
     </LinearLayout>
 

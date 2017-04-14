@@ -9,33 +9,60 @@
         android:layout_height="60dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/increment_id"
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="60dp"
+            android:background="@color/colorAccent"/>
+
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="#100005789"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"/>
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorAccent"/>
+
+
+            <TextView
+                android:id="@+id/increment_id"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="#100005789"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorAccent"/>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/accept_button"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="@android:color/holo_green_dark"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
             android:text="@string/accept"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white"
+            android:textSize="20sp"/>
 
-        <TextView
-            android:id="@+id/accepted_text_view"
-            android:layout_width="90dp"
-            android:layout_height="wrap_content"
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/accepted_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:text="ACCEPTED"
-            android:textColor="@android:color/holo_blue_dark"
-            android:textSize="18sp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="{fa-check-circle @android:color/white 40sp}"
             android:visibility="gone"/>
 
     </LinearLayout>

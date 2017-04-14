@@ -2,6 +2,7 @@ package com.yoscholar.deliveryboy.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,26 +19,29 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class OrderDetailsActivity extends AppCompatActivity {
+public class OrderDetailsActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String DELIVERED = "Delivered";
     private static final String RE_DELIVER = "Re-Deliver";
@@ -50,21 +54,25 @@ public class OrderDetailsActivity extends AppCompatActivity {
     private TextView payMode;
     private TextView total;
 
-    private IconButton routeLookUpButton;
-    private IconButton callButton;
-    private IconButton deliverySuccessfulButton;
-    private IconButton deliveryExceptionButton;
+    private Button deliverySuccessfulButton;
+    private Button deliveryExceptionButton;
     private final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 100;
 
     private ProgressDialog progressDialog;
 
-    private LinearLayout orderContainer;
+    private FrameLayout orderContainer;
     private LinearLayout exceptionReasonContainer;
 
     private RadioGroup deliveryExceptionRadioGroup;
     private EditText otherReasonEditText;
     private Button okButton;
     private Button cancelButton;
+
+    private DatePickerDialog datePickerDialog;
+    private Calendar calendar = Calendar.getInstance();
+    private int year = calendar.get(Calendar.YEAR);
+    private int month = calendar.get(Calendar.MONTH);
+    private int day = calendar.get(Calendar.DAY_OF_MONTH);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +90,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
 
-        orderContainer = (LinearLayout) findViewById(R.id.order_container);
+        orderContainer = (FrameLayout) findViewById(R.id.order_container);
         exceptionReasonContainer = (LinearLayout) findViewById(R.id.exception_reason_container);
 
         progressDialog = new ProgressDialog(OrderDetailsActivity.this);
@@ -105,6 +113,19 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
         otherReasonEditText = (EditText) findViewById(R.id.other_reason_edit_text);
 
+        datePickerDialog = new DatePickerDialog(OrderDetailsActivity.this, OrderDetailsActivity.this, year, month, day);
+        datePickerDialog.setCanceledOnTouchOutside(false);
+        datePickerDialog.setCancelable(false);
+        datePickerDialog.setMessage("Select Future Delivery Date : ");
+        datePickerDialog.setButton(DatePickerDialog.BUTTON_NEGATIVE, "", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+
+
         deliveryExceptionRadioGroup = (RadioGroup) findViewById(R.id.delivery_exception_radio_group);
         deliveryExceptionRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -119,6 +140,9 @@ public class OrderDetailsActivity extends AppCompatActivity {
                     case R.id.future_delivery_requested:
                         otherReasonEditText.setText("");
                         otherReasonEditText.setVisibility(View.VISIBLE);
+
+                        datePickerDialog.show();
+
                         break;
 
                     case R.id.unable_to_collect_cash:
@@ -199,26 +223,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
             }
         });
 
-        routeLookUpButton = (IconButton) findViewById(R.id.route_lookup_button);
-        routeLookUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                openMapsForNavigation();
-            }
-        });
-
-        callButton = (IconButton) findViewById(R.id.call_button);
-        callButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                callTheCustomer();
-
-            }
-        });
-
-        deliverySuccessfulButton = (IconButton) findViewById(R.id.delivered_successfully_button);
+        deliverySuccessfulButton = (Button) findViewById(R.id.delivered_successfully_button);
         deliverySuccessfulButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -243,7 +248,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
             }
         });
 
-        deliveryExceptionButton = (IconButton) findViewById(R.id.delivery_exception_button);
+        deliveryExceptionButton = (Button) findViewById(R.id.delivery_exception_button);
         deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -252,7 +257,6 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 exceptionReasonContainer.setVisibility(View.VISIBLE);
             }
         });
-
     }
 
     private void callTheCustomer() {
@@ -411,5 +415,16 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+
+        calendar.set(year, month, dayOfMonth);
+
+        SimpleDateFormat format = new SimpleDateFormat("EEE, d MMM yyyy");
+        String strDate = format.format(calendar.getTime());
+
+        otherReasonEditText.setText(strDate);
     }
 }
