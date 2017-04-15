@@ -12,12 +12,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -25,10 +27,14 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Database;
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
+import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
@@ -62,11 +68,20 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
     private FrameLayout orderContainer;
     private LinearLayout exceptionReasonContainer;
+    private LinearLayout deliverySuccessfulContainer;
 
     private RadioGroup deliveryExceptionRadioGroup;
     private EditText otherReasonEditText;
-    private Button okButton;
-    private Button cancelButton;
+    private Button okButtonFailed;
+    private Button cancelButtonFailed;
+
+    private EditText nameOfPersonEditText;
+    private Spinner payModeSpinner;
+    private Spinner relationSpinner;
+    private Button okButtonSuccess;
+    private Button cancelButtonSuccess;
+    private String[] payModeArray = {"Select Pay Mode", "Cash", "Card", "Cheque", "Wallet"};
+    private String[] relationArray = {"Select Relation", "Self", "Neighbour", "Security"};
 
     private DatePickerDialog datePickerDialog;
     private Calendar calendar = Calendar.getInstance();
@@ -92,6 +107,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
         orderContainer = (FrameLayout) findViewById(R.id.order_container);
         exceptionReasonContainer = (LinearLayout) findViewById(R.id.exception_reason_container);
+        deliverySuccessfulContainer = (LinearLayout) findViewById(R.id.successful_delivery_details_container);
 
         progressDialog = new ProgressDialog(OrderDetailsActivity.this);
         progressDialog.setIndeterminate(true);
@@ -111,6 +127,18 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         payMode.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD));
         total.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_TOTAL));
 
+        nameOfPersonEditText = (EditText) findViewById(R.id.person_who_collected);
+        payModeSpinner = (Spinner) findViewById(R.id.pay_mode_spinner);
+        relationSpinner = (Spinner) findViewById(R.id.relation_spinner);
+
+        ArrayAdapter<String> payModeArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, payModeArray);
+        payModeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        payModeSpinner.setAdapter(payModeArrayAdapter);
+
+        ArrayAdapter<String> relationArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, relationArray);
+        relationArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        relationSpinner.setAdapter(relationArrayAdapter);
+
         otherReasonEditText = (EditText) findViewById(R.id.other_reason_edit_text);
 
         datePickerDialog = new DatePickerDialog(OrderDetailsActivity.this, OrderDetailsActivity.this, year, month, day);
@@ -124,7 +152,6 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
             }
         });
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-
 
         deliveryExceptionRadioGroup = (RadioGroup) findViewById(R.id.delivery_exception_radio_group);
         deliveryExceptionRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -174,8 +201,8 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         });
 
 
-        okButton = (Button) findViewById(R.id.ok_button);
-        okButton.setOnClickListener(new View.OnClickListener() {
+        okButtonFailed = (Button) findViewById(R.id.ok_button_failed);
+        okButtonFailed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -213,8 +240,8 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
             }
         });
 
-        cancelButton = (Button) findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        cancelButtonFailed = (Button) findViewById(R.id.cancel_button_failed);
+        cancelButtonFailed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -223,27 +250,51 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
             }
         });
 
+
+        okButtonSuccess = (Button) findViewById(R.id.ok_button_success);
+        okButtonSuccess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean validationSuccessfull = true;
+
+                if (TextUtils.isEmpty(nameOfPersonEditText.getText().toString())) {
+                    validationSuccessfull = false;
+                    nameOfPersonEditText.setError("This field cannot be empty.");
+                } else if (payModeSpinner.getSelectedItemPosition() == 0) {
+                    validationSuccessfull = false;
+                    ((TextView) payModeSpinner.getSelectedView()).setError("Please select an option.");
+                } else if (relationSpinner.getSelectedItemPosition() == 0) {
+                    validationSuccessfull = false;
+                    ((TextView) relationSpinner.getSelectedView()).setError("Please select an option.");
+                }
+
+                if (validationSuccessfull) {
+
+                    progressDialog.show();
+
+                    updateOrder(DELIVERED, "Collected by : " + nameOfPersonEditText.getText() + "\n Pay Mode : " + payModeArray[payModeSpinner.getSelectedItemPosition()] + "\n Relation : " + relationArray[relationSpinner.getSelectedItemPosition()]);
+                }
+            }
+        });
+
+        cancelButtonSuccess = (Button) findViewById(R.id.cancel_button_success);
+        cancelButtonSuccess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                orderContainer.setVisibility(View.VISIBLE);
+                deliverySuccessfulContainer.setVisibility(View.GONE);
+            }
+        });
+
         deliverySuccessfulButton = (Button) findViewById(R.id.delivered_successfully_button);
         deliverySuccessfulButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                new AlertDialog.Builder(OrderDetailsActivity.this)
-                        .setMessage("Are you sure?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                progressDialog.show();
-                                updateOrder(DELIVERED, "");
-
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .show();
+                orderContainer.setVisibility(View.GONE);
+                deliverySuccessfulContainer.setVisibility(View.VISIBLE);
 
             }
         });
@@ -327,7 +378,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         startActivity(intent);
     }
 
-    private void updateOrder(String status, String comment) {
+    private void updateOrder(final String status, String comment) {
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
@@ -349,7 +400,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
                 if (response.isSuccessful()) {
 
-                    checkTheResponseAndProceed(response.body());
+                    checkTheResponseAndProceed(response.body(), status);
 
                 } else {
 
@@ -370,9 +421,26 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         });
     }
 
-    private void checkTheResponseAndProceed(UpdateOrder updateOrder) {
+    private void checkTheResponseAndProceed(UpdateOrder updateOrder, String status) {
 
         if (updateOrder.getStatus().equalsIgnoreCase("success")) {
+
+            Database database = CouchBaseHelper.openCouchBaseDB(OrderDetailsActivity.this);
+            Orderdatum orderdatum = CouchBaseHelper.getAnAcceptedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+
+            if (status.equals(DELIVERED)) {
+
+                if (orderdatum != null)
+                    CouchBaseHelper.saveDeliveredOrderInDB(database, orderdatum);
+
+            } else if (status.equals(RE_DELIVER)) {
+
+                if (orderdatum != null)
+                    CouchBaseHelper.saveFailedOrderInDB(database, orderdatum);
+
+            }
+
+            CouchBaseHelper.deleteAcceptedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
 
             Toast.makeText(this, updateOrder.getMessage(), Toast.LENGTH_SHORT).show();
             setResult(Activity.RESULT_OK);//set result OK

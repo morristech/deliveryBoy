@@ -14,4 +14,5 @@
     <string name="other">Other</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="decline">DECLINE</string>
 </resources>

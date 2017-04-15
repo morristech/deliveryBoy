@@ -58,16 +58,19 @@ public class RetrofitApi {
         );
 
         @FormUrlEncoded
-        @POST("agrimtool/android/deliveryBoyAPI.php?function=acceptOrder")
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=acceptOrDecline")
         Call<AcceptOrder> acceptAnOrder(
                 @Field("order_ship_id") String orderShipId,
-                @Field("token") String token
+                @Field("token") String token,
+                @Field("flag") int flag,// 1 = accept/0 = decline
+                @Field("db_name") String dbName,
+                @Field("increment_id") String incrementId
         );
 
         @FormUrlEncoded
         @POST("agrimtool/android/deliveryBoyAPI.php?function=updateOrder")
         Call<UpdateOrder> updateOrder(
-                @Field("increment_id") String orderId,
+                @Field("increment_id") String incrementId,
                 @Field("comment") String comment,
                 @Field("order_ship_id") String orderShipId,
                 @Field("status") String status,

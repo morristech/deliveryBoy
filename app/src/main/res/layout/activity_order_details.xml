@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_order_details"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,7 +9,7 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -19,13 +18,13 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="@color/colorPrimary"/>
+            android:background="@color/colorPrimary" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="100dp"
-            android:background="@color/colorAccent"/>
+            android:background="@color/colorAccent" />
 
         <ScrollView
             android:id="@+id/order_container"
@@ -50,7 +49,7 @@
                     android:text="Order Details"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -60,7 +59,7 @@
                     android:text="Order ID"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/increment_id"
@@ -70,14 +69,14 @@
                     android:layout_marginLeft="25dp"
                     android:text="#100008736"
                     android:textColor="@color/colorAccent"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:background="@color/colorAccent"/>
+                    android:background="@color/colorAccent" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -88,7 +87,7 @@
                     android:text="Customer Name"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/customer_name"
@@ -98,14 +97,14 @@
                     android:layout_marginLeft="25dp"
                     android:text="Vipin Kumar"
                     android:textColor="@color/colorAccent"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:background="@color/colorAccent"/>
+                    android:background="@color/colorAccent" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -116,7 +115,7 @@
                     android:text="Address"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/customer_address"
@@ -124,16 +123,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
                     android:text="129/4, 4th Main, 18th Cross, Rajivgandhi Nagar, HSR, 560068"
                     android:textColor="@color/colorAccent"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:background="@color/colorAccent"/>
+                    android:background="@color/colorAccent" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -144,7 +144,7 @@
                     android:text="Pay Mode"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/customer_payment_method"
@@ -154,14 +154,14 @@
                     android:layout_marginLeft="25dp"
                     android:text="Prepaid"
                     android:textColor="@color/colorAccent"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:background="@color/colorAccent"/>
+                    android:background="@color/colorAccent" />
 
 
                 <TextView
@@ -173,7 +173,7 @@
                     android:text="Total"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/customer_total"
@@ -183,14 +183,14 @@
                     android:layout_marginLeft="25dp"
                     android:text="Prepaid"
                     android:textColor="@color/colorAccent"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:background="@color/colorAccent"/>
+                    android:background="@color/colorAccent" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -208,7 +208,7 @@
                         android:background="@android:color/black"
                         android:text="Success"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                     <Button
                         android:id="@+id/delivery_exception_button"
@@ -220,7 +220,7 @@
                         android:background="@android:color/black"
                         android:text="Failed"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -243,15 +243,15 @@
                 android:layout_marginTop="25sp"
                 android:text="Select a reason : "
                 android:textColor="@android:color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:background="@color/colorAccent"/>
+                android:background="@color/colorAccent" />
 
 
             <RadioGroup
@@ -267,42 +267,42 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="@string/door_locked"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp" />
 
                 <RadioButton
                     android:id="@+id/future_delivery_requested"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/future_delivery_requested"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp" />
 
                 <RadioButton
                     android:id="@+id/unable_to_collect_cash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/unable_to_collect_cash"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp" />
 
                 <RadioButton
                     android:id="@+id/customer_not_accepting_package"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/customer_not_accepting_package"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp" />
 
                 <RadioButton
                     android:id="@+id/unable_to_go"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/unable_to_go"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp" />
 
                 <RadioButton
                     android:id="@+id/other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/other"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp" />
 
             </RadioGroup>
 
@@ -312,10 +312,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="Enter here"
                 android:layout_marginTop="20sp"
+                android:hint="Enter here"
                 android:inputType="text"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -326,7 +326,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/ok_button"
+                    android:id="@+id/ok_button_failed"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="25sp"
@@ -335,10 +335,10 @@
                     android:background="@android:color/black"
                     android:text="@string/ok"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <Button
-                    android:id="@+id/cancel_button"
+                    android:id="@+id/cancel_button_failed"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -348,7 +348,97 @@
                     android:background="@android:color/black"
                     android:text="@string/cancel"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/successful_delivery_details_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@android:color/white"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15sp"
+                android:layout_marginLeft="25sp"
+                android:layout_marginTop="25sp"
+                android:text="Fill up the details : "
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/colorAccent" />
+
+            <EditText
+                android:id="@+id/person_who_collected"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10sp"
+                android:hint="Name of person"
+                android:inputType="text" />
+
+            <Spinner
+                android:id="@+id/pay_mode_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="20dp" />
+
+            <Spinner
+                android:id="@+id/relation_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="20dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25sp"
+                android:layout_marginTop="25sp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/ok_button_success"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25sp"
+                    android:layout_marginRight="5sp"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:text="@string/ok"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/cancel_button_success"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5sp"
+                    android:layout_marginRight="25sp"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:text="@string/cancel"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
 

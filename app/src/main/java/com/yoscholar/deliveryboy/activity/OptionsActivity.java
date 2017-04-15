@@ -24,6 +24,8 @@ public class OptionsActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 900;
     private IconButton acceptOrdersButton;
     private IconButton deliverOrdersButton;
+    private IconButton deliveredButton;
+    private IconButton failedButton;
     private Toolbar toolbar;
 
     @Override
@@ -56,6 +58,25 @@ public class OptionsActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 startActivity(new Intent(OptionsActivity.this, DeliverOrdersActivity.class));
+            }
+        });
+
+        deliveredButton = (IconButton) findViewById(R.id.delivered_button);
+        deliveredButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(OptionsActivity.this, DeliveredOrdersActivity.class));
+            }
+        });
+
+        failedButton = (IconButton) findViewById(R.id.failed_button);
+        failedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(OptionsActivity.this, FailedOrdersActivity.class));
+
             }
         });
     }

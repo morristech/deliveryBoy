@@ -105,7 +105,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
         if (acceptOrders.getStatus().equalsIgnoreCase("success")) {
 
-            Toast.makeText(AcceptOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(AcceptOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
 
             acceptOrdersListViewAdapter = new AcceptOrdersListViewAdapter(AcceptOrdersActivity.this, acceptOrders);
 

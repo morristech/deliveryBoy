@@ -40,12 +40,14 @@ public class DeliverOrdersActivity extends AppCompatActivity {
     private ListView normalOrdersListView;
 
     private ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+    AcceptedOrdersListViewAdapter acceptedOrdersListViewAdapter = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_orders);
+        setContentView(R.layout.activity_deliver_orders);
 
         init();
 
@@ -119,7 +121,7 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
     private void displayAcceptedOrdersInListView() {
 
-        AcceptedOrdersListViewAdapter acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderdatumArrayList);
+        acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderdatumArrayList);
 
         normalOrdersListView.setAdapter(acceptedOrdersListViewAdapter);
         normalOrdersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -174,7 +176,9 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
 
-                Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
+                Database database = CouchBaseHelper.openCouchBaseDB(DeliverOrdersActivity.this);
+                orderdatumArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
+                acceptedOrdersListViewAdapter.notifyDataSetChanged();
             }
         }
 
@@ -193,8 +197,9 @@ public class DeliverOrdersActivity extends AppCompatActivity {
     }
 
 
+    //called form the AcceptedOrdersListViewAdapter
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onBackGroundOrdersSyncFinished(Orderdatum orderdatum) {
+    public void onDeliverButtonClick(Orderdatum orderdatum) {
 
         goToOrderDetailsActivity(orderdatum);
     }
