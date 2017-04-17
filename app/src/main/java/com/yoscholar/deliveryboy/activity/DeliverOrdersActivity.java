@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,7 +35,9 @@ public class DeliverOrdersActivity extends AppCompatActivity {
     public static final String CUSTOMER_PAYMENT_METHOD = "customer_payment_method";
     public static final String CUSTOMER_TOTAL = "customer_total";
     public static final String ORDER_SHIP_ID = "order_ship_id";
+    public static final String CALLED_FROM = "called_from";
     private static final int MY_REQUEST_CODE = 200;
+    private static final String TAG = DeliverOrdersActivity.class.getSimpleName();
 
     private Toolbar toolbar;
     private ListView normalOrdersListView;
@@ -124,25 +127,6 @@ public class DeliverOrdersActivity extends AppCompatActivity {
         acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderdatumArrayList);
 
         normalOrdersListView.setAdapter(acceptedOrdersListViewAdapter);
-        normalOrdersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Intent intent = new Intent(DeliverOrdersActivity.this, OrderDetailsActivity.class);
-
-                intent.putExtra(INCREMENT_ID, orderdatumArrayList.get(position).getIncrementId());
-                intent.putExtra(ORDER_ID, orderdatumArrayList.get(position).getOrderId());
-                intent.putExtra(CUSTOMER_NAME, orderdatumArrayList.get(position).getCustomerName());
-                intent.putExtra(CUSTOMER_PHONE, orderdatumArrayList.get(position).getPhone());
-                intent.putExtra(CUSTOMER_ADDRESS, orderdatumArrayList.get(position).getAddress() + ", " + orderdatumArrayList.get(position).getCity() + ", " + orderdatumArrayList.get(position).getPincode());
-                intent.putExtra(CUSTOMER_PAYMENT_METHOD, orderdatumArrayList.get(position).getMethod());
-                intent.putExtra(CUSTOMER_TOTAL, orderdatumArrayList.get(position).getTotal());
-                intent.putExtra(ORDER_SHIP_ID, orderdatumArrayList.get(position).getOrdershipid());
-
-                startActivityForResult(intent, MY_REQUEST_CODE);
-
-            }
-        });
 
     }
 
@@ -176,9 +160,16 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
 
+                //get new data from db
                 Database database = CouchBaseHelper.openCouchBaseDB(DeliverOrdersActivity.this);
                 orderdatumArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
-                acceptedOrdersListViewAdapter.notifyDataSetChanged();
+
+                //refresh the list with new data
+                displayAcceptedOrdersInListView();
+
+                Log.d(TAG, "data : " + orderdatumArrayList);
+
+                Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -215,6 +206,7 @@ public class DeliverOrdersActivity extends AppCompatActivity {
         intent.putExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD, orderdatum.getMethod());
         intent.putExtra(DeliverOrdersActivity.CUSTOMER_TOTAL, orderdatum.getTotal());
         intent.putExtra(DeliverOrdersActivity.ORDER_SHIP_ID, orderdatum.getOrdershipid());
+        intent.putExtra(DeliverOrdersActivity.CALLED_FROM, DeliverOrdersActivity.class.getSimpleName());
 
         startActivityForResult(intent, MY_REQUEST_CODE);
 

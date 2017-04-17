@@ -1,33 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorAccent" />
-
-    <TextView
-        android:id="@+id/increment_id"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/colorPrimary"
-        android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" />
+        android:background="@color/colorAccent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorAccent" />
+            android:background="@color/colorAccent"/>
 
         <com.joanzapata.iconify.widget.IconTextView
             android:id="@+id/route"
@@ -37,9 +28,9 @@
             android:layout_marginLeft="20dp"
             android:background="@drawable/circle"
             android:gravity="center"
-            android:text="{fa-map-marker}"
+            android:text="{fa-check}"
             android:textColor="@color/colorPrimary"
-            android:textSize="30sp" />
+            android:textSize="30sp"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -49,35 +40,28 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/customer_name"
+                android:id="@+id/increment_id"
                 android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:layout_marginTop="10dp"
-                android:textColor="@android:color/black"
-                android:textSize="17sp" />
-
-            <TextView
-                android:id="@+id/address"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:textColor="@color/colorAccent"
-                android:textSize="13sp" />
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorAccent" />
+            android:background="@color/colorAccent"/>
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorAccent" />
+        android:background="@color/colorAccent"/>
 
 
 </LinearLayout>

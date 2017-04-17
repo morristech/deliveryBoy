@@ -84,6 +84,35 @@
                     android:layout_marginBottom="3dp"
                     android:layout_marginLeft="25dp"
                     android:layout_marginTop="10dp"
+                    android:text="Ship ID"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/order_ship_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="25dp"
+                    android:text="#8723164"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorAccent" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="10dp"
                     android:text="Customer Name"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"

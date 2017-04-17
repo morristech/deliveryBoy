@@ -41,7 +41,10 @@ public class Orderdatum {
     private String ordershipid;
     @SerializedName("accept_status")
     @Expose
-    private Integer acceptStatus;
+    private String acceptStatus;
+    @SerializedName("action_date")
+    @Expose
+    private String actionDate;
 
     public String getIncrementId() {
         return incrementId;
@@ -131,12 +134,20 @@ public class Orderdatum {
         this.ordershipid = ordershipid;
     }
 
-    public Integer getAcceptStatus() {
+    public String getAcceptStatus() {
         return acceptStatus;
     }
 
-    public void setAcceptStatus(Integer acceptStatus) {
+    public void setAcceptStatus(String acceptStatus) {
         this.acceptStatus = acceptStatus;
+    }
+
+    public String getActionDate() {
+        return actionDate;
+    }
+
+    public void setActionDate(String actionDate) {
+        this.actionDate = actionDate;
     }
 
 }

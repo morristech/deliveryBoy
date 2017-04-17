@@ -72,13 +72,13 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText("#" + acceptOrders.getOrderdata().get(position).getIncrementId());
+        incrementId.setText("#" + acceptOrders.getOrderdata().get(position).getIncrementId() + ",\n#" + acceptOrders.getOrderdata().get(position).getOrdershipid());
 
         Button acceptButton = (Button) convertView.findViewById(R.id.accept_button);
 
         Button declineButton = (Button) convertView.findViewById(R.id.decline_button);
 
-        if (acceptOrders.getOrderdata().get(position).getAcceptStatus() == 0) {
+        if (acceptOrders.getOrderdata().get(position).getAcceptStatus().equals("0")) {
 
             incrementId.setBackgroundResource(android.R.color.white);
 
@@ -89,13 +89,12 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
 
-                    Toast.makeText(context, "Position : " + position, Toast.LENGTH_SHORT).show();
-                    acceptOrDeclineAnOrder(acceptOrders.getOrderdata().get(position).getOrdershipid(), acceptOrders.getOrderdata().get(position), 1);
+                    //Toast.makeText(context, "Position : " + position, Toast.LENGTH_SHORT).show();
+                    acceptOrDeclineAnOrder(acceptOrders.getOrderdata().get(position).getOrdershipid(), acceptOrders.getOrderdata().get(position), "1");
                 }
             });
 
-
-        } else if (acceptOrders.getOrderdata().get(position).getAcceptStatus() == 1) {
+        } else if (acceptOrders.getOrderdata().get(position).getAcceptStatus().equals("1")) {
 
             incrementId.setBackgroundResource(R.color.colorPrimary);
 
@@ -106,8 +105,14 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
 
-                    //Toast.makeText(context, "Position : " + position, Toast.LENGTH_SHORT).show();
-                    acceptOrDeclineAnOrder(acceptOrders.getOrderdata().get(position).getOrdershipid(), acceptOrders.getOrderdata().get(position), 0);
+                    if (!checkIfTheOrderIsPresentInFailedOrders(acceptOrders.getOrderdata().get(position).getOrdershipid())) {
+
+                        //Toast.makeText(context, "Position : " + position, Toast.LENGTH_SHORT).show();
+                        acceptOrDeclineAnOrder(acceptOrders.getOrderdata().get(position).getOrdershipid(), acceptOrders.getOrderdata().get(position), "0");
+                    } else {
+
+                        Toast.makeText(context, "This order is present in failed orders. Go to failed orders to deliver it.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
@@ -116,13 +121,20 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void acceptOrDeclineAnOrder(String orderShipId, final Orderdatum orderdatum, final int flag) {
+    private boolean checkIfTheOrderIsPresentInFailedOrders(String orderShipId) {
+
+        Database database = CouchBaseHelper.openCouchBaseDB(context);
+
+        return CouchBaseHelper.checkIfAnOrderIsPresentInFailedOrders(database, orderShipId);
+    }
+
+    private void acceptOrDeclineAnOrder(String orderShipId, final Orderdatum orderdatum, final String flag) {
 
         progressDialog.show();
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
-        Call<AcceptOrder> acceptOrderCall = apiInterface.acceptAnOrder(
+        Call<AcceptOrder> acceptOrderCall = apiInterface.acceptOrDeclineAnOrder(
                 orderShipId,//orderShipId
                 AppPreference.getString(context, AppPreference.TOKEN),//jwt token
                 flag,
@@ -143,9 +155,9 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
                         //Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
 
-                        if (flag == 1)//save the accepted order in DB
+                        if (flag.equals("1"))//save the accepted order in DB
                             saveTheAcceptedOrderInDb(orderdatum);
-                        else if (flag == 0)
+                        else if (flag.equals("0"))
                             deleteTheAcceptedOrderFromDB(orderdatum);
 
                         //reload the list of orders to accept
@@ -183,7 +195,7 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
         Database database = CouchBaseHelper.openCouchBaseDB(context);
 
-        if (CouchBaseHelper.deleteAcceptedOrderFromDB(database, orderdatum.getIncrementId()))
+        if (CouchBaseHelper.deleteAnAcceptedOrderFromDB(database, orderdatum.getOrdershipid()))
             Toast.makeText(context, "Order declined successfully.", Toast.LENGTH_SHORT).show();
         else
             Toast.makeText(context, "Order could not be declined.", Toast.LENGTH_SHORT).show();
@@ -194,7 +206,7 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
         Database database = CouchBaseHelper.openCouchBaseDB(context);
 
-        if (CouchBaseHelper.saveAcceptedOrderInDB(database, orderdatum))
+        if (CouchBaseHelper.saveAnAcceptedOrderInDB(database, orderdatum))
             Toast.makeText(context, "Order accepted successfully.", Toast.LENGTH_SHORT).show();
         else
             Toast.makeText(context, "Order could not be accepted.", Toast.LENGTH_SHORT).show();

@@ -1,24 +1,16 @@
 package com.yoscholar.deliveryboy.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.joanzapata.iconify.widget.IconButton;
-import com.joanzapata.iconify.widget.IconTextView;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Created by agrim on 27/2/17.
@@ -61,15 +53,7 @@ public class DeliveredOrdersListViewAdapter extends BaseAdapter {
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText("#" + orderdatumArrayList.get(position).getIncrementId() + ", " + orderdatumArrayList.get(position).getMethod());
-
-        TextView customerName = (TextView) convertView.findViewById(R.id.customer_name);
-        customerName.setText(orderdatumArrayList.get(position).getCustomerName());
-
-        TextView address = (TextView) convertView.findViewById(R.id.address);
-        address.setText(orderdatumArrayList.get(position).getAddress() + ",\n" +
-                orderdatumArrayList.get(position).getCity() + ", " +
-                orderdatumArrayList.get(position).getPincode());
+        incrementId.setText("#" + orderdatumArrayList.get(position).getIncrementId() + "\n\n#" + orderdatumArrayList.get(position).getOrdershipid() + "\n\n" + orderdatumArrayList.get(position).getMethod());
 
         return convertView;
     }

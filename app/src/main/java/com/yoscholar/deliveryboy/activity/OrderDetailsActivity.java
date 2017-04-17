@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.text.TextUtilsCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -54,7 +52,8 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
     private Toolbar toolbar;
 
-    private TextView orderId;
+    private TextView incrementId;
+    private TextView orderShipId;
     private TextView customerName;
     private TextView address;
     private TextView payMode;
@@ -115,13 +114,15 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
 
-        orderId = (TextView) findViewById(R.id.increment_id);
+        incrementId = (TextView) findViewById(R.id.increment_id);
+        orderShipId = (TextView) findViewById(R.id.order_ship_id);
         customerName = (TextView) findViewById(R.id.customer_name);
         address = (TextView) findViewById(R.id.customer_address);
         payMode = (TextView) findViewById(R.id.customer_payment_method);
         total = (TextView) findViewById(R.id.customer_total);
 
-        orderId.setText(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+        incrementId.setText(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+        orderShipId.setText(getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
         customerName.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_NAME));
         address.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS));
         payMode.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD));
@@ -300,14 +301,29 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         });
 
         deliveryExceptionButton = (Button) findViewById(R.id.delivery_exception_button);
-        deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                orderContainer.setVisibility(View.GONE);
-                exceptionReasonContainer.setVisibility(View.VISIBLE);
-            }
-        });
+        if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
+
+            deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ;
+                }
+            });
+
+            deliveryExceptionButton.setBackgroundResource(R.color.colorAccent);
+
+        } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
+
+            deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    orderContainer.setVisibility(View.GONE);
+                    exceptionReasonContainer.setVisibility(View.VISIBLE);
+                }
+            });
+        }
     }
 
     private void callTheCustomer() {
@@ -426,7 +442,16 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         if (updateOrder.getStatus().equalsIgnoreCase("success")) {
 
             Database database = CouchBaseHelper.openCouchBaseDB(OrderDetailsActivity.this);
-            Orderdatum orderdatum = CouchBaseHelper.getAnAcceptedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+            Orderdatum orderdatum = null;
+
+            if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
+
+                orderdatum = CouchBaseHelper.getAnAcceptedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+
+            } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
+
+                orderdatum = CouchBaseHelper.getAFailedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+            }
 
             if (status.equals(DELIVERED)) {
 
@@ -440,7 +465,11 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
             }
 
-            CouchBaseHelper.deleteAcceptedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
+            if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
+                CouchBaseHelper.deleteAnAcceptedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+            } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
+                CouchBaseHelper.deleteAFailedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+            }
 
             Toast.makeText(this, updateOrder.getMessage(), Toast.LENGTH_SHORT).show();
             setResult(Activity.RESULT_OK);//set result OK

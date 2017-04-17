@@ -7,7 +7,6 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
-import com.mobsandgeeks.saripaar.annotation.Order;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.utils.Util;
 
@@ -23,7 +22,7 @@ import java.util.Map;
 
 public class CouchBaseHelper {
 
-    public static final String TAG = CouchBaseHelper.class.getSimpleName();
+    private static final String TAG = CouchBaseHelper.class.getSimpleName();
 
     private static final String ACCEPTED_ORDERS_DOCUMENT_ID = "acceptedOrders";
     private static final String DELIVERED_ORDERS_DOCUMENT_ID = "deliveredOrders";
@@ -41,7 +40,7 @@ public class CouchBaseHelper {
     public static final String ORDER_TYPE = "ordertype";
     public static final String ORDER_SHIP_ID = "ordershipid";
     public static final String ACCEPT_STATUS = "accept_status";
-    public static final String ACTION_DATE = "actionDate";//refers to accept, deliver or failed action
+    public static final String ACTION_DATE = "action_date";//refers to accept, deliver or failed action date
 
 
     /**
@@ -77,7 +76,7 @@ public class CouchBaseHelper {
      * @param orderdatum order data of an order
      * @return boolean indicating whether accepted order was saved or not
      */
-    public static boolean saveAcceptedOrderInDB(Database database, Orderdatum orderdatum) {
+    public static boolean saveAnAcceptedOrderInDB(Database database, Orderdatum orderdatum) {
 
         boolean flag = true;
 
@@ -99,8 +98,8 @@ public class CouchBaseHelper {
         orderMap.put(TOTAL, orderdatum.getTotal());
         orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
-        orderMap.put(ACCEPT_STATUS, 1);
-        orderMap.put(ACTION_DATE, Util.getCurrentDateAndTime());
+        orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
+        orderMap.put(ACTION_DATE, orderdatum.getActionDate());
 
         Document document = database.createDocument();
 
@@ -111,7 +110,7 @@ public class CouchBaseHelper {
             flag = false;
         }
 
-        map.put(orderdatum.getIncrementId(), document.getId());// increment_id : document_id
+        map.put(orderdatum.getOrdershipid(), document.getId());// ordershipid : document_id
 
         try {
             acceptedOrdersDocument.putProperties(map);
@@ -159,7 +158,8 @@ public class CouchBaseHelper {
                     orderdatum.setTotal(document.getProperty(TOTAL).toString());
                     orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
                     orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                    orderdatum.setAcceptStatus(Integer.parseInt(document.getProperty(ACCEPT_STATUS).toString()));
+                    orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
+                    orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
 
                     orderdatumArrayList.add(orderdatum);
                 }
@@ -172,10 +172,11 @@ public class CouchBaseHelper {
     /**
      * Get an accepted order from the DB
      *
-     * @param database database
+     * @param orderShipId ordersShipId
+     * @param database    database
      * @return accepted order
      */
-    public static Orderdatum getAnAcceptedOrder(Database database, String incrementId) {
+    public static Orderdatum getAnAcceptedOrder(Database database, String orderShipId) {
 
         Document acceptedOrdersDocument = database.getDocument(ACCEPTED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = acceptedOrdersDocument.getProperties();
@@ -191,7 +192,7 @@ public class CouchBaseHelper {
                 else {
                     //System.out.println(pair.getKey() + " = " + pair.getValue());
 
-                    if (incrementId.equals(pair.getKey().toString())) {
+                    if (orderShipId.equals(pair.getKey().toString())) {
 
                         //delete the document
                         Document document = database.getDocument(pair.getValue().toString());
@@ -208,8 +209,8 @@ public class CouchBaseHelper {
                         orderdatum.setTotal(document.getProperty(TOTAL).toString());
                         orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
                         orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                        orderdatum.setAcceptStatus(Integer.parseInt(document.getProperty(ACCEPT_STATUS).toString()));
-
+                        orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
+                        orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
 
                     }
                 }
@@ -223,10 +224,10 @@ public class CouchBaseHelper {
      * delete an accepted order from the DB
      *
      * @param database    database
-     * @param incrementId incrementId of the order
+     * @param orderShipId orderShipId of the order
      * @return boolean indicating whether the operation was successful or not
      */
-    public static boolean deleteAcceptedOrderFromDB(Database database, String incrementId) {
+    public static boolean deleteAnAcceptedOrderFromDB(Database database, String orderShipId) {
 
         boolean flag = true;
 
@@ -246,9 +247,9 @@ public class CouchBaseHelper {
                     ;
                 else {
                     //System.out.println(pair.getKey() + " = " + pair.getValue());
-                    if (incrementId.equals(pair.getKey().toString())) {
+                    if (orderShipId.equals(pair.getKey().toString())) {
 
-                        keyToDelete = incrementId;
+                        keyToDelete = orderShipId;
 
                         //delete the document
                         Document document = database.getDocument(pair.getValue().toString());
@@ -324,7 +325,7 @@ public class CouchBaseHelper {
         orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
         orderMap.put(ACCEPT_STATUS, 1);
-        orderMap.put(ACTION_DATE, Util.getCurrentDateAndTime());
+        orderMap.put(ACTION_DATE, Util.getCurrentDate());
 
         Document document = database.createDocument();
 
@@ -335,7 +336,7 @@ public class CouchBaseHelper {
             flag = false;
         }
 
-        map.put(orderdatum.getIncrementId(), document.getId());// increment_id : document_id
+        map.put(orderdatum.getOrdershipid(), document.getId());// ordershipid : document_id
 
         try {
             deliveredOrdersDocument.putProperties(map);
@@ -378,7 +379,7 @@ public class CouchBaseHelper {
         orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
         orderMap.put(ACCEPT_STATUS, 1);
-        orderMap.put(ACTION_DATE, Util.getCurrentDateAndTime());
+        orderMap.put(ACTION_DATE, Util.getCurrentDate());
 
         Document document = database.createDocument();
 
@@ -389,7 +390,7 @@ public class CouchBaseHelper {
             flag = false;
         }
 
-        map.put(orderdatum.getIncrementId(), document.getId());// increment_id : document_id
+        map.put(orderdatum.getOrdershipid(), document.getId());// ordershipid : document_id
 
         try {
             failedOrdersDocument.putProperties(map);
@@ -437,7 +438,8 @@ public class CouchBaseHelper {
                     orderdatum.setTotal(document.getProperty(TOTAL).toString());
                     orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
                     orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                    orderdatum.setAcceptStatus(Integer.parseInt(document.getProperty(ACCEPT_STATUS).toString()));
+                    orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
+                    orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
 
                     orderdatumArrayList.add(orderdatum);
                 }
@@ -455,8 +457,8 @@ public class CouchBaseHelper {
      */
     public static ArrayList<Orderdatum> getAllFailedOrders(Database database) {
 
-        Document acceptedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
-        Map<String, Object> map = acceptedOrdersDocument.getProperties();
+        Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = failedOrdersDocument.getProperties();
 
         ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
 
@@ -482,7 +484,8 @@ public class CouchBaseHelper {
                     orderdatum.setTotal(document.getProperty(TOTAL).toString());
                     orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
                     orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                    orderdatum.setAcceptStatus(Integer.parseInt(document.getProperty(ACCEPT_STATUS).toString()));
+                    orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
+                    orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
 
                     orderdatumArrayList.add(orderdatum);
                 }
@@ -490,5 +493,162 @@ public class CouchBaseHelper {
         }
 
         return orderdatumArrayList;
+    }
+
+
+    /**
+     * Check if an order is present in failed orders
+     *
+     * @param database    database
+     * @param orderShipId orderShipId
+     * @return boolean indicating if the order is present in failed orders
+     */
+    public static boolean checkIfAnOrderIsPresentInFailedOrders(Database database, String orderShipId) {
+
+        Document acceptedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = acceptedOrdersDocument.getProperties();
+
+        if (map != null) {
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+                    if (pair.getKey().toString().equals(orderShipId))
+                        return true;
+
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * delete a failed order from the DB
+     *
+     * @param database    database
+     * @param orderShipId orderShipId
+     * @return boolean indicating whether the operation was successful or not
+     */
+    public static boolean deleteAFailedOrderFromDB(Database database, String orderShipId) {
+
+        boolean flag = true;
+
+        Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = new HashMap<>();
+
+        String keyToDelete = null;
+
+        if (failedOrdersDocument.getProperties() != null)
+            map.putAll(failedOrdersDocument.getProperties());//put old data from the document in the new map( update )
+
+        if (map != null) {
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+                    if (orderShipId.equals(pair.getKey().toString())) {
+
+                        keyToDelete = orderShipId;
+
+                        //delete the document
+                        Document document = database.getDocument(pair.getValue().toString());
+
+                        try {
+
+                            document.purge();
+
+                        } catch (CouchbaseLiteException e) {
+
+                            Log.d(TAG, "Error while purging : " + e);
+                            flag = false;
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+
+        if (keyToDelete != null) {
+
+            //remove entry from acceptedOrdersDocument
+            map.remove(keyToDelete);
+            try {
+
+                failedOrdersDocument.putProperties(map);
+
+            } catch (CouchbaseLiteException e) {
+
+                Log.e(TAG, "Error putting : " + e);
+                flag = false;
+
+            }
+        }
+
+        Log.d(TAG, "failed orders  : " + failedOrdersDocument.getProperties());
+
+        return flag;
+
+    }
+
+    /**
+     * Get a failed order from the DB
+     *
+     * @param database    database
+     * @param orderShipId orderShipId
+     * @return failed order
+     */
+    public static Orderdatum getAFailedOrder(Database database, String orderShipId) {
+
+        Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = failedOrdersDocument.getProperties();
+
+        Orderdatum orderdatum = null;
+
+        if (map != null) {
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+
+                    if (orderShipId.equals(pair.getKey().toString())) {
+
+                        //delete the document
+                        Document document = database.getDocument(pair.getValue().toString());
+
+                        orderdatum = new Orderdatum();
+                        orderdatum.setIncrementId(document.getProperty(INCREMENT_ID).toString());
+                        orderdatum.setOrderId(document.getProperty(ORDER_ID).toString());
+                        orderdatum.setCustomerName(document.getProperty(CUSTOMER_NAME).toString());
+                        orderdatum.setPhone(document.getProperty(PHONE).toString());
+                        orderdatum.setAddress(document.getProperty(ADDRESS).toString());
+                        orderdatum.setCity(document.getProperty(CITY).toString());
+                        orderdatum.setPincode(document.getProperty(PINCODE).toString());
+                        orderdatum.setMethod(document.getProperty(METHOD).toString());
+                        orderdatum.setTotal(document.getProperty(TOTAL).toString());
+                        orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
+                        orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
+                        orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
+                        orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
+
+                    }
+                }
+            }
+        }
+
+        return orderdatum;
     }
 }

@@ -50,9 +50,9 @@ public class Util {
         return androidId;
     }
 
-    public static String getCurrentDateAndTime() {
+    public static String getCurrentDate() {
         //getting current date and time using Date class
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        DateFormat df = new SimpleDateFormat("Y-m-d", Locale.ENGLISH);
         Date date = new Date();
         System.out.println(df.format(date));
 

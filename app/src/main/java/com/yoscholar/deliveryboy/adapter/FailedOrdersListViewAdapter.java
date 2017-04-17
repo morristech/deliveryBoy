@@ -24,13 +24,13 @@ import java.util.Locale;
  * Created by agrim on 27/2/17.
  */
 
-public class AcceptedOrdersListViewAdapter extends BaseAdapter {
+public class FailedOrdersListViewAdapter extends BaseAdapter {
 
     private static final int MY_REQUEST_CODE = 967;
     private Context context;
     private ArrayList<Orderdatum> orderdatumArrayList;
 
-    public AcceptedOrdersListViewAdapter(Context context, ArrayList<Orderdatum> orderdatumArrayList) {
+    public FailedOrdersListViewAdapter(Context context, ArrayList<Orderdatum> orderdatumArrayList) {
         this.context = context;
         this.orderdatumArrayList = orderdatumArrayList;
     }
