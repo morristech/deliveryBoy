@@ -9,12 +9,16 @@ import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 
 public class RetrofitApi {
@@ -76,6 +80,16 @@ public class RetrofitApi {
                 @Field("status") String status,
                 @Field("db_name") String dbName,
                 @Field("token") String token
+        );
+
+        @GET
+        Call<ResponseBody> sendMessage(
+                @Url String url,
+                @Query("workingkey") String workingKey,
+                @Query("to") String to,
+                @Query("sender") String sender,
+                @Query("message") String message
+
         );
     }
 }

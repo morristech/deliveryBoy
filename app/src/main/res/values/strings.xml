@@ -15,4 +15,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="decline">DECLINE</string>
+    <string name="profile">Profile</string>
+    <string name="summary">Summary</string>
 </resources>

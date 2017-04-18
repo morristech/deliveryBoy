@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,8 +72,14 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
         }
 
+        LinearLayout idContainer  = (LinearLayout) convertView.findViewById(R.id.id_container);
+
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText("#" + acceptOrders.getOrderdata().get(position).getIncrementId() + ",\n#" + acceptOrders.getOrderdata().get(position).getOrdershipid());
+        incrementId.setText("ORDER ID : " + acceptOrders.getOrderdata().get(position).getIncrementId());
+
+        TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
+        orderShipId.setText("SHIP ID : "+acceptOrders.getOrderdata().get(position).getOrdershipid());
+
 
         Button acceptButton = (Button) convertView.findViewById(R.id.accept_button);
 
@@ -80,7 +87,7 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
         if (acceptOrders.getOrderdata().get(position).getAcceptStatus().equals("0")) {
 
-            incrementId.setBackgroundResource(android.R.color.white);
+            idContainer.setBackgroundResource(android.R.color.white);
 
             acceptButton.setVisibility(View.VISIBLE);
             declineButton.setVisibility(View.GONE);
@@ -96,7 +103,7 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
         } else if (acceptOrders.getOrderdata().get(position).getAcceptStatus().equals("1")) {
 
-            incrementId.setBackgroundResource(R.color.colorPrimary);
+            idContainer.setBackgroundResource(R.color.colorPrimary);
 
             acceptButton.setVisibility(View.GONE);
             declineButton.setVisibility(View.VISIBLE);

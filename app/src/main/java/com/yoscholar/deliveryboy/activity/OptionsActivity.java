@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.IoniconsIcons;
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.utils.AppPreference;
@@ -86,11 +86,7 @@ public class OptionsActivity extends AppCompatActivity {
 
         getMenuInflater().inflate(R.menu.menu_options_activity, menu);
 
-        menu.findItem(R.id.settings).setIcon(new IconDrawable(this, FontAwesomeIcons.fa_gear)
-                .colorRes(android.R.color.white)
-                .actionBarSize());
-
-        menu.findItem(R.id.log_out).setIcon(new IconDrawable(this, FontAwesomeIcons.fa_sign_out)
+        menu.findItem(R.id.summary).setIcon(new IconDrawable(this, IoniconsIcons.ion_android_clipboard)
                 .colorRes(android.R.color.white)
                 .actionBarSize());
 
@@ -103,6 +99,18 @@ public class OptionsActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
 
+            case R.id.profile:
+
+                startActivity(new Intent(OptionsActivity.this, ProfileActivity.class));
+
+                return true;
+
+            case R.id.settings:
+
+                startActivity(new Intent(OptionsActivity.this, SettingsActivity.class));
+
+                return true;
+
             case R.id.log_out:
 
                 //logout
@@ -114,12 +122,6 @@ public class OptionsActivity extends AppCompatActivity {
                 openLoginScreen();
 
                 finish();
-
-                return true;
-
-            case R.id.settings:
-
-                startActivity(new Intent(OptionsActivity.this, SettingsActivity.class));
 
                 return true;
 
@@ -152,7 +154,7 @@ public class OptionsActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(this, "Permission Granted.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "Permission Granted.", Toast.LENGTH_SHORT).show();
 
                     // permission was granted
 

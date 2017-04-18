@@ -14,11 +14,17 @@ import com.joanzapata.iconify.widget.IconButton;
 import com.joanzapata.iconify.widget.IconTextView;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by agrim on 27/2/17.
@@ -61,19 +67,20 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText("#" + orderdatumArrayList.get(position).getIncrementId() + ", #" + orderdatumArrayList.get(position).getOrdershipid() + ", " + orderdatumArrayList.get(position).getMethod());
+        incrementId.setText(orderdatumArrayList.get(position).getIncrementId());
+
+        TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
+        orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
+
+        TextView payMode = (TextView) convertView.findViewById(R.id.pay_method);
+        payMode.setText(orderdatumArrayList.get(position).getMethod());
 
         TextView customerName = (TextView) convertView.findViewById(R.id.customer_name);
         customerName.setText(orderdatumArrayList.get(position).getCustomerName());
 
         TextView address = (TextView) convertView.findViewById(R.id.address);
-        address.setText(orderdatumArrayList.get(position).getAddress() + ",\n" +
-                orderdatumArrayList.get(position).getCity() + ", " +
-                orderdatumArrayList.get(position).getPincode());
+        address.setText(orderdatumArrayList.get(position).getAddress() + ", " + orderdatumArrayList.get(position).getCity() + ", " + orderdatumArrayList.get(position).getPincode());
 
-        /*TextView paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
-        paymentMethod.setText(orderdatumArrayList.get(position).getMethod());
-*/
         IconButton call = (IconButton) convertView.findViewById(R.id.call);
         call.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +98,9 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(context, "To Do", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "To Do", Toast.LENGTH_SHORT).show();
+                String message = "Dear Customer, Your Order " + orderdatumArrayList.get(position).getIncrementId() + " could not be delivered. Please call 1860 212 1860 to reschedule the delivery.";
+                sendMessage(orderdatumArrayList.get(position).getPhone(), message);
             }
         });
 
@@ -105,7 +114,7 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             }
         });
 
-        IconTextView route = (IconTextView) convertView.findViewById(R.id.route);
+        IconButton route = (IconButton) convertView.findViewById(R.id.route);
         route.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,5 +134,35 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    private void sendMessage(String phone, String message) {
+
+        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
+
+        Call<ResponseBody> sendMessageCall = apiInterface.sendMessage(
+                "http://trans.kapsystem.com/api/web2sms.php",
+                "A3bc8ddacb55a7d989292cb3f5a6e7aa0",
+                phone,
+                "YOSCLR",
+                message
+        );
+
+        sendMessageCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                if (context != null)
+                    Toast.makeText(context, "Message request sent successfully.", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                if (context != null)
+                    Toast.makeText(context, "Something went wrong. Please try again later.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

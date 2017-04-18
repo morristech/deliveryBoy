@@ -53,7 +53,16 @@ public class DeliveredOrdersListViewAdapter extends BaseAdapter {
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText("#" + orderdatumArrayList.get(position).getIncrementId() + "\n\n#" + orderdatumArrayList.get(position).getOrdershipid() + "\n\n" + orderdatumArrayList.get(position).getMethod());
+        incrementId.setText(orderdatumArrayList.get(position).getIncrementId());
+
+        TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
+        orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
+
+        TextView payMethod = (TextView) convertView.findViewById(R.id.pay_method);
+        payMethod.setText(orderdatumArrayList.get(position).getMethod());
+
+        TextView actionDate = (TextView) convertView.findViewById(R.id.action_date);
+        actionDate.setText(orderdatumArrayList.get(position).getActionDate());
 
         return convertView;
     }
