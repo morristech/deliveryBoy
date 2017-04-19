@@ -11,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.joanzapata.iconify.widget.IconButton;
-import com.joanzapata.iconify.widget.IconTextView;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
@@ -72,7 +71,7 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
         TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
         orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
 
-        TextView payMode = (TextView) convertView.findViewById(R.id.pay_method);
+        TextView payMode = (TextView) convertView.findViewById(R.id.payment_method);
         payMode.setText(orderdatumArrayList.get(position).getMethod());
 
         TextView customerName = (TextView) convertView.findViewById(R.id.customer_name);

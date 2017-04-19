@@ -99,6 +99,12 @@ public class OptionsActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
 
+            case R.id.summary:
+
+                startActivity(new Intent(OptionsActivity.this, SummaryActivity.class));
+
+                return true;
+
             case R.id.profile:
 
                 startActivity(new Intent(OptionsActivity.this, ProfileActivity.class));

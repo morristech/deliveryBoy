@@ -1,17 +1,12 @@
 package com.yoscholar.deliveryboy.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -56,7 +51,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
     private TextView orderShipId;
     private TextView customerName;
     private TextView address;
-    private TextView payMode;
+    private TextView paymentMethod;
     private TextView total;
 
     private Button deliverySuccessfulButton;
@@ -79,7 +74,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
     private Spinner relationSpinner;
     private Button okButtonSuccess;
     private Button cancelButtonSuccess;
-    private String[] payModeArray = {"Select Pay Mode", "Cash", "Card", "Cheque", "Wallet"};
+    private String[] payModeArray = {"Select Pay Mode", "Prepaid", "Cash", "Card", "Cheque", "Wallet"};
     private String[] relationArray = {"Select Relation", "Self", "Neighbour", "Security"};
 
     private DatePickerDialog datePickerDialog;
@@ -118,14 +113,14 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         orderShipId = (TextView) findViewById(R.id.order_ship_id);
         customerName = (TextView) findViewById(R.id.customer_name);
         address = (TextView) findViewById(R.id.customer_address);
-        payMode = (TextView) findViewById(R.id.customer_payment_method);
+        paymentMethod = (TextView) findViewById(R.id.customer_payment_method);
         total = (TextView) findViewById(R.id.customer_total);
 
         incrementId.setText(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
         orderShipId.setText(getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
         customerName.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_NAME));
         address.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS));
-        payMode.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD));
+        paymentMethod.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD));
         total.setText(getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_TOTAL));
 
         nameOfPersonEditText = (EditText) findViewById(R.id.person_who_collected);
@@ -294,6 +289,12 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
             @Override
             public void onClick(View v) {
 
+                if (getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD).equals(CouchBaseHelper.PAYMENT_COD))
+                    payModeSpinner.setSelection(0);
+                else if (getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD).equals(CouchBaseHelper.PAYMENT_PREPAID))
+                    payModeSpinner.setSelection(1);
+
+
                 orderContainer.setVisibility(View.GONE);
                 deliverySuccessfulContainer.setVisibility(View.VISIBLE);
 
@@ -324,60 +325,6 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
                 }
             });
         }
-    }
-
-    private void callTheCustomer() {
-
-        //if the permission is not granted already
-        if (ContextCompat.checkSelfPermission(OrderDetailsActivity.this, Manifest.permission.CALL_PHONE) != PackageManager
-                .PERMISSION_GRANTED) {
-
-            requestPermissionToMakePhoneCalls();
-
-        } else {
-
-            makePhoneCall();
-
-        }
-
-    }
-
-    private void requestPermissionToMakePhoneCalls() {
-
-        ActivityCompat.requestPermissions(OrderDetailsActivity.this, new String[]{Manifest.permission.CALL_PHONE},
-                MY_PERMISSIONS_REQUEST_CALL_PHONE);
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CALL_PHONE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted
-                    makePhoneCall();
-
-                } else {
-
-                    // permission denied
-                    Toast.makeText(this, "Permission Denied.", Toast.LENGTH_SHORT).show();
-                }
-                return;
-            }
-
-        }
-    }
-
-    private void makePhoneCall() {
-
-        String uri = "tel:" + getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_PHONE);
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse(uri));
-        startActivity(intent);
-
     }
 
     private void openMapsForNavigation() {
@@ -456,7 +403,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
             if (status.equals(DELIVERED)) {
 
                 if (orderdatum != null)
-                    CouchBaseHelper.saveDeliveredOrderInDB(database, orderdatum);
+                    CouchBaseHelper.saveDeliveredOrderInDB(database, orderdatum, payModeArray[payModeSpinner.getSelectedItemPosition()]);
 
             } else if (status.equals(RE_DELIVER)) {
 

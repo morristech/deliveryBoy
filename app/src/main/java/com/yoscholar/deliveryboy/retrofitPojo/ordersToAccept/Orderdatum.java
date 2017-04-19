@@ -45,6 +45,9 @@ public class Orderdatum {
     @SerializedName("action_date")
     @Expose
     private String actionDate;
+    @SerializedName("pay_mode")
+    @Expose
+    private String payMode;
 
     public String getIncrementId() {
         return incrementId;
@@ -148,6 +151,14 @@ public class Orderdatum {
 
     public void setActionDate(String actionDate) {
         this.actionDate = actionDate;
+    }
+
+    public String getPayMode() {
+        return payMode;
+    }
+
+    public void setPayMode(String payMode) {
+        this.payMode = payMode;
     }
 
 }

@@ -41,7 +41,17 @@ public class CouchBaseHelper {
     public static final String ORDER_SHIP_ID = "ordershipid";
     public static final String ACCEPT_STATUS = "accept_status";
     public static final String ACTION_DATE = "action_date";//refers to accept, deliver or failed action date
+    public static final String PAY_MODE = "pay_mode";//refers to pay mode in case of COD
 
+    //PAYMENT METHODS
+    public static final String PAYMENT_COD = "COD";
+    public static final String PAYMENT_PREPAID = "Prepaid";
+
+    //PAY_MODE TYPES
+    public static final String PAY_MODE_CASH = "pay_mode_cash";
+    public static final String PAY_MODE_CARD = "pay_mode_card";
+    public static final String PAY_MODE_CHEQUE = "pay_mode_cheque";
+    public static final String PAY_MODE_WALLET = "pay_mode_wallet";
 
     /**
      * Open database connection
@@ -100,6 +110,7 @@ public class CouchBaseHelper {
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
         orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
         orderMap.put(ACTION_DATE, orderdatum.getActionDate());
+        orderMap.put(PAY_MODE, orderdatum.getPayMode());
 
         Document document = database.createDocument();
 
@@ -160,6 +171,7 @@ public class CouchBaseHelper {
                     orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
                     orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
                     orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
+                    orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
 
                     orderdatumArrayList.add(orderdatum);
                 }
@@ -211,6 +223,7 @@ public class CouchBaseHelper {
                         orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
                         orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
                         orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
+                        orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
 
                     }
                 }
@@ -300,9 +313,10 @@ public class CouchBaseHelper {
      *
      * @param database   database
      * @param orderdatum orderdatum
+     * @param payMode payMode
      * @return boolean indicating whether the action was successful or not
      */
-    public static boolean saveDeliveredOrderInDB(Database database, Orderdatum orderdatum) {
+    public static boolean saveDeliveredOrderInDB(Database database, Orderdatum orderdatum, String payMode) {
 
         Document deliveredOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = new HashMap<>();
@@ -326,6 +340,7 @@ public class CouchBaseHelper {
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
         orderMap.put(ACCEPT_STATUS, 1);
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
+        orderMap.put(PAY_MODE, payMode);
 
         Document document = database.createDocument();
 
@@ -380,6 +395,7 @@ public class CouchBaseHelper {
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
         orderMap.put(ACCEPT_STATUS, 1);
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
+        orderMap.put(PAY_MODE, orderdatum.getPayMode());
 
         Document document = database.createDocument();
 
@@ -440,6 +456,7 @@ public class CouchBaseHelper {
                     orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
                     orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
                     orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
+                    orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
 
                     orderdatumArrayList.add(orderdatum);
                 }
@@ -486,6 +503,7 @@ public class CouchBaseHelper {
                     orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
                     orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
                     orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
+                    orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
 
                     orderdatumArrayList.add(orderdatum);
                 }
@@ -643,6 +661,7 @@ public class CouchBaseHelper {
                         orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
                         orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
                         orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
+                        orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
 
                     }
                 }

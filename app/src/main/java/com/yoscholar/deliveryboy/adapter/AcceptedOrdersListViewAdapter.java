@@ -71,8 +71,8 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
         TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
         orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
 
-        TextView payMode = (TextView) convertView.findViewById(R.id.pay_method);
-        payMode.setText(orderdatumArrayList.get(position).getMethod());
+        TextView paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
+        paymentMethod.setText(orderdatumArrayList.get(position).getMethod());
 
         TextView customerName = (TextView) convertView.findViewById(R.id.customer_name);
         customerName.setText(orderdatumArrayList.get(position).getCustomerName());
