@@ -2,10 +2,8 @@
 <LinearLayout
     android:id="@+id/linear_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yoscholar.deliveryboy.activity.SummaryActivity"
     android:orientation="vertical">
 
     <include
@@ -14,10 +12,223 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <lecho.lib.hellocharts.view.LineChartView
-        android:id="@+id/chart"
-        android:padding="20dp"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center">
 
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/previous_date"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"
+            android:text="{ion-chevron-left 25sp @android:color/black}"/>
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/rectangle_bordered"
+            android:gravity="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"/>
+
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/next_date"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"
+            android:text="{ion-chevron-right 25sp @android:color/black}"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/rectangle_bordered"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:text="Details"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="25dp"
+            android:text="Accepted Orders"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/accepted_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:text="0"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:text="Delivered Orders"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/delivered_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:text="0"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:text="COD Orders"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/cod_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:text="0"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:text="Cash COD Orders"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/cash_cod_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:text="0"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:text="Cash Collected"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/cash_collected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:text="0"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.joanzapata.iconify.widget.IconTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="{fa-minus @color/colorPrimary 25sp} Delivered     {fa-minus @android:color/black 25sp} Failed"
+            android:textColor="@color/colorAccent"/>
+
+        <lecho.lib.hellocharts.view.LineChartView
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:padding="20dp"/>
+    </LinearLayout>
 </LinearLayout>

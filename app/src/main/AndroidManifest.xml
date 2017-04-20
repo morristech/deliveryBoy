@@ -56,8 +56,10 @@
             android:name=".activity.ProfileActivity"
             android:label="Profile"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.SummaryActivity">
-        </activity>
+        <activity
+            android:name=".activity.SummaryActivity"
+            android:label="Summary"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

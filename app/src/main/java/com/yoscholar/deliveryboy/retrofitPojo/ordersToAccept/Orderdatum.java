@@ -45,6 +45,9 @@ public class Orderdatum {
     @SerializedName("action_date")
     @Expose
     private String actionDate;
+    @SerializedName("accepted_date")
+    @Expose
+    private String acceptedDate;
     @SerializedName("pay_mode")
     @Expose
     private String payMode;
@@ -151,6 +154,14 @@ public class Orderdatum {
 
     public void setActionDate(String actionDate) {
         this.actionDate = actionDate;
+    }
+
+    public String getAcceptedDate() {
+        return acceptedDate;
+    }
+
+    public void setAcceptedDate(String acceptedDate) {
+        this.acceptedDate = acceptedDate;
     }
 
     public String getPayMode() {

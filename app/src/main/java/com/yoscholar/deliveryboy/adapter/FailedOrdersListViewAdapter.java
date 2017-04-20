@@ -1,8 +1,11 @@
 package com.yoscholar.deliveryboy.adapter;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +13,14 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Database;
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
+import com.yoscholar.deliveryboy.pojo.FailedOrderDeleted;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.retrofitPojo.reDeliver.ReDeliver;
+import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import org.greenrobot.eventbus.EventBus;
@@ -34,10 +42,16 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
     private static final int MY_REQUEST_CODE = 967;
     private Context context;
     private ArrayList<Orderdatum> orderdatumArrayList;
+    private ProgressDialog progressDialog;
 
     public FailedOrdersListViewAdapter(Context context, ArrayList<Orderdatum> orderdatumArrayList) {
         this.context = context;
         this.orderdatumArrayList = orderdatumArrayList;
+        this.progressDialog = new ProgressDialog(this.context);
+        this.progressDialog.setIndeterminate(true);
+        this.progressDialog.setMessage("Please wait....");
+        this.progressDialog.setCancelable(false);
+        this.progressDialog.setCanceledOnTouchOutside(false);
     }
 
     @Override
@@ -61,7 +75,7 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
         if (convertView == null) {
 
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.accepted_orders_list_item, parent, false);
+            convertView = inflater.inflate(R.layout.failed_orders_list_item, parent, false);
 
         }
 
@@ -98,7 +112,7 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 //Toast.makeText(context, "To Do", Toast.LENGTH_SHORT).show();
-                String message = "Dear Customer, Your Order " + orderdatumArrayList.get(position).getIncrementId() + " could not be delivered. Please call 1860 212 1860 to reschedule the delivery.";
+                String message = "Dear Customer, we tried reaching you to deliver your order " + orderdatumArrayList.get(position).getIncrementId() + ". Please call 1860 212 1860 to reschedule the delivery.";
                 sendMessage(orderdatumArrayList.get(position).getPhone(), message);
             }
         });
@@ -132,7 +146,90 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             }
         });
 
+        IconButton reDeliver = (IconButton) convertView.findViewById(R.id.redeliver);
+        reDeliver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new AlertDialog.Builder(context)
+                        .setMessage("Are you sure?")
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with redeliver
+                                reDeliverOrder(orderdatumArrayList.get(position));
+
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+
+            }
+        });
+
         return convertView;
+    }
+
+    private void reDeliverOrder(final Orderdatum orderdatum) {
+
+        progressDialog.show();
+
+        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
+
+        Call<ReDeliver> reDeliverCall = apiInterface.redeliver(
+                orderdatum.getIncrementId(),//incrementId
+                orderdatum.getOrdershipid(),//orderShipId
+                AppPreference.getString(context, AppPreference.NAME),//db name
+                AppPreference.getString(context, AppPreference.TOKEN)//jwt token
+        );
+
+        reDeliverCall.enqueue(new Callback<ReDeliver>() {
+            @Override
+            public void onResponse(Call<ReDeliver> call, Response<ReDeliver> response) {
+
+                progressDialog.dismiss();
+
+                if (response.isSuccessful()) {
+
+                    if (response.body().getStatus().equalsIgnoreCase("success")) {
+
+                        Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
+                        Database database = CouchBaseHelper.openCouchBaseDB(context);
+                        if (CouchBaseHelper.deleteAFailedOrderFromDB(database, orderdatum.getOrdershipid()))
+                            EventBus.getDefault().post(new FailedOrderDeleted(true));
+
+                    } else if (response.body().getStatus().equalsIgnoreCase("failure")) {
+
+                        //show message
+                        Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
+                        EventBus.getDefault().post(new FailedOrderDeleted(false));
+
+                    }
+
+                } else {
+
+                    Toast.makeText(context, "Some error.", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ReDeliver> call, Throwable t) {
+
+                progressDialog.dismiss();
+
+                if (context != null)
+                    Toast.makeText(context, "Network Problem.", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
 
     private void sendMessage(String phone, String message) {

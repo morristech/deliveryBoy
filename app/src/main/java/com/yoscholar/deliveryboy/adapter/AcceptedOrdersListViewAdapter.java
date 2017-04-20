@@ -98,7 +98,7 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 //Toast.makeText(context, "To Do", Toast.LENGTH_SHORT).show();
-                String message = "Dear Customer, Your Order " + orderdatumArrayList.get(position).getIncrementId() + " could not be delivered. Please call 1860 212 1860 to reschedule the delivery.";
+                String message = "Dear Customer, we tried reaching you to deliver your order " + orderdatumArrayList.get(position).getIncrementId() + ". Please call 1860 212 1860 to reschedule the delivery.";
                 sendMessage(orderdatumArrayList.get(position).getPhone(), message);
             }
         });

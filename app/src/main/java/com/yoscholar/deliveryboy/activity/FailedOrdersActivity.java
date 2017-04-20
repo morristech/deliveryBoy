@@ -11,7 +11,9 @@ import com.couchbase.lite.Database;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.FailedOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
+import com.yoscholar.deliveryboy.pojo.FailedOrderDeleted;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.utils.AppPreference;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -120,7 +122,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
     }
 
 
-    //called form the AcceptedOrdersListViewAdapter
+    //called form the FailedOrdersListViewAdapter
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeliverButtonClick(Orderdatum orderdatum) {
 
@@ -141,6 +143,39 @@ public class FailedOrdersActivity extends AppCompatActivity {
         intent.putExtra(DeliverOrdersActivity.CALLED_FROM, FailedOrdersActivity.class.getSimpleName());
 
         startActivityForResult(intent, MY_REQUEST_CODE);
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onOrderRedelivered(FailedOrderDeleted failedOrderDeleted) {
+
+        if (failedOrderDeleted.isDeleted()) {
+
+            //get new data from db
+            Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
+            orderdatumArrayList = CouchBaseHelper.getAllFailedOrders(database);
+
+            //refresh the list with new data
+            displayAcceptedOrdersInListView();
+
+        } else {
+
+            //logout
+            AppPreference.clearPreferencesLogout(FailedOrdersActivity.this);
+
+            //open login screen
+            openLoginScreen();
+
+            finish();
+        }
+
+    }
+
+    private void openLoginScreen() {
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
 
     }
 }

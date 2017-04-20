@@ -4,6 +4,7 @@ package com.yoscholar.deliveryboy.utils;
 import com.yoscholar.deliveryboy.retrofitPojo.acceptAnOrder.AcceptOrder;
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
+import com.yoscholar.deliveryboy.retrofitPojo.reDeliver.ReDeliver;
 import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 
 import java.util.concurrent.TimeUnit;
@@ -91,5 +92,15 @@ public class RetrofitApi {
                 @Query("message") String message
 
         );
+
+        @FormUrlEncoded
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=redeliver")
+        Call<ReDeliver> redeliver(
+                @Field("increment_id") String incrementId,
+                @Field("order_ship_id") String orderShipId,
+                @Field("db_name") String dbName,
+                @Field("token") String token
+        );
+
     }
 }

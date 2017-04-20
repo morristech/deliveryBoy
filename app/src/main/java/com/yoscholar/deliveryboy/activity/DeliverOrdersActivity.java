@@ -169,7 +169,7 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
                 Log.d(TAG, "data : " + orderdatumArrayList);
 
-                Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
             }
         }
 

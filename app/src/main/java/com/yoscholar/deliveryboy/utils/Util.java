@@ -52,7 +52,7 @@ public class Util {
 
     public static String getCurrentDate() {
         //getting current date and time using Date class
-        DateFormat df = new SimpleDateFormat("d MMM Y", Locale.ENGLISH);
+        DateFormat df = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
         Date date = new Date();
         System.out.println(df.format(date));
 
