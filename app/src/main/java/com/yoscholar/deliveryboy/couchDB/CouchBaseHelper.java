@@ -342,7 +342,7 @@ public class CouchBaseHelper {
         orderMap.put(TOTAL, orderdatum.getTotal());
         orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
-        orderMap.put(ACCEPT_STATUS, 1);
+        orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
         orderMap.put(PAY_MODE, payMode);
         orderMap.put(ACCEPTED_DATE, orderdatum.getAcceptedDate());
@@ -398,7 +398,7 @@ public class CouchBaseHelper {
         orderMap.put(TOTAL, orderdatum.getTotal());
         orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
-        orderMap.put(ACCEPT_STATUS, 1);
+        orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
         orderMap.put(PAY_MODE, orderdatum.getPayMode());
         orderMap.put(ACCEPTED_DATE, orderdatum.getAcceptedDate());

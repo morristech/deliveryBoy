@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 
 import java.util.ArrayList;
@@ -59,7 +60,10 @@ public class DeliveredOrdersListViewAdapter extends BaseAdapter {
         orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
 
         TextView payMode = (TextView) convertView.findViewById(R.id.payment_method);
-        payMode.setText(orderdatumArrayList.get(position).getPayMode());
+        if (orderdatumArrayList.get(position).getMethod().equals(CouchBaseHelper.PAYMENT_COD))
+            payMode.setText(orderdatumArrayList.get(position).getPayMode() + " : " + orderdatumArrayList.get(position).getTotal());
+        else
+            payMode.setText(orderdatumArrayList.get(position).getActionDate());
 
         TextView actionDate = (TextView) convertView.findViewById(R.id.action_date);
         actionDate.setText(orderdatumArrayList.get(position).getActionDate());

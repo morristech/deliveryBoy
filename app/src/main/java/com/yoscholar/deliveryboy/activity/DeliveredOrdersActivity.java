@@ -1,36 +1,43 @@
 package com.yoscholar.deliveryboy.activity;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.DatePicker;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.couchbase.lite.Database;
+import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
-import com.yoscholar.deliveryboy.adapter.AcceptedOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.adapter.DeliveredOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.utils.Util;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Calendar;
+import java.util.Locale;
 
-public class DeliveredOrdersActivity extends AppCompatActivity {
+public class DeliveredOrdersActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Toolbar toolbar;
     private ListView deliveredOrdersListView;
 
     private ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+
+    private DatePickerDialog datePickerDialog;
+    private Calendar calendar = Calendar.getInstance();
+    private int year = calendar.get(Calendar.YEAR);
+    private int month = calendar.get(Calendar.MONTH);
+    private int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+    private TextView selectedDateTextView;
+    private IconButton dateButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,26 +57,40 @@ public class DeliveredOrdersActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        deliveredOrdersListView = (ListView) findViewById(R.id.delivered_orders_list_view);
-
-        Database database = CouchBaseHelper.openCouchBaseDB(DeliveredOrdersActivity.this);
-
+        Database database = CouchBaseHelper.openCouchBaseDB(this);
         orderdatumArrayList = CouchBaseHelper.getAllDeliveredOrders(database);
 
-        Collections.sort(orderdatumArrayList, new Comparator<Orderdatum>() {
-            @Override
-            public int compare(Orderdatum o1, Orderdatum o2) {
+        deliveredOrdersListView = (ListView) findViewById(R.id.delivered_orders_list_view);
 
-                return o1.getIncrementId().compareTo(o2.getIncrementId());
+        datePickerDialog = new DatePickerDialog(this, this, year, month, day);
+        datePickerDialog.setCanceledOnTouchOutside(false);
+        datePickerDialog.setCancelable(false);
+
+        selectedDateTextView = (TextView) findViewById(R.id.selected_date);
+        dateButton = (IconButton) findViewById(R.id.date_button);
+        dateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePickerDialog.show();
             }
         });
 
-        displayAcceptedOrdersInListView();
+        selectedDateTextView.setText(Util.getCurrentDate());
+        displayAcceptedOrdersInListView(Util.getCurrentDate());
     }
 
-    private void displayAcceptedOrdersInListView() {
+    private void displayAcceptedOrdersInListView(String date) {
 
-        DeliveredOrdersListViewAdapter deliveredOrdersListViewAdapter = new DeliveredOrdersListViewAdapter(DeliveredOrdersActivity.this, orderdatumArrayList);
+        ArrayList<Orderdatum> filteredOrderdatumArrayList = new ArrayList<>();
+
+        for (Orderdatum orderdatum : orderdatumArrayList) {
+
+            if (!orderdatum.getAcceptedDate().equals(""))
+                if (orderdatum.getAcceptedDate().equals(date))
+                    filteredOrderdatumArrayList.add(orderdatum);
+        }
+
+        DeliveredOrdersListViewAdapter deliveredOrdersListViewAdapter = new DeliveredOrdersListViewAdapter(DeliveredOrdersActivity.this, filteredOrderdatumArrayList);
 
         deliveredOrdersListView.setAdapter(deliveredOrdersListViewAdapter);
 
@@ -91,4 +112,16 @@ public class DeliveredOrdersActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+
+        calendar.set(year, month, dayOfMonth);
+
+        SimpleDateFormat format = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
+        String date = format.format(calendar.getTime());
+
+        selectedDateTextView.setText(date);
+
+        displayAcceptedOrdersInListView(date);
+    }
 }

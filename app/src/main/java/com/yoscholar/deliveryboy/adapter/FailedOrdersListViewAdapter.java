@@ -2,10 +2,8 @@ package com.yoscholar.deliveryboy.adapter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +11,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.couchbase.lite.Database;
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
-import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
-import com.yoscholar.deliveryboy.pojo.FailedOrderDeleted;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
-import com.yoscholar.deliveryboy.retrofitPojo.reDeliver.ReDeliver;
-import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import org.greenrobot.eventbus.EventBus;
@@ -146,7 +139,7 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             }
         });
 
-        IconButton reDeliver = (IconButton) convertView.findViewById(R.id.redeliver);
+        /*IconButton reDeliver = (IconButton) convertView.findViewById(R.id.redeliver);
         reDeliver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,12 +161,12 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
                         .show();
 
             }
-        });
+        });*/
 
         return convertView;
     }
 
-    private void reDeliverOrder(final Orderdatum orderdatum) {
+    /*private void reDeliverOrder(final Orderdatum orderdatum) {
 
         progressDialog.show();
 
@@ -230,7 +223,7 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             }
         });
 
-    }
+    }*/
 
     private void sendMessage(String phone, String message) {
 
@@ -248,8 +241,9 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                if (context != null)
-                    Toast.makeText(context, "Message request sent successfully.", Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful())
+                    if (context != null)
+                        Toast.makeText(context, "Message request sent successfully.", Toast.LENGTH_SHORT).show();
 
             }
 

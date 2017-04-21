@@ -18,16 +18,8 @@
         android:layout_margin="20dp"
         android:gravity="center">
 
-        <com.joanzapata.iconify.widget.IconButton
-            android:id="@+id/previous_date"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@color/colorPrimary"
-            android:text="{ion-chevron-left 25sp @android:color/black}"/>
-
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/selected_date"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
@@ -37,12 +29,12 @@
             android:textSize="18sp"/>
 
         <com.joanzapata.iconify.widget.IconButton
-            android:id="@+id/next_date"
+            android:id="@+id/date_button"
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:background="@color/colorPrimary"
-            android:text="{ion-chevron-right 25sp @android:color/black}"/>
+            android:text="{ion-chevron-right 25sp @android:color/white}"/>
 
     </LinearLayout>
 

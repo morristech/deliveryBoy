@@ -1,5 +1,6 @@
 package com.yoscholar.deliveryboy.activity;
 
+import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.couchbase.lite.Database;
@@ -14,10 +16,12 @@ import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.utils.Util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -34,23 +38,25 @@ import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.view.LineChartView;
 
-public class SummaryActivity extends AppCompatActivity {
+public class SummaryActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Toolbar toolbar;
 
-    private IconButton previousDate;
-    private IconButton nextDate;
-    private TextView date;
+    private TextView selectedDateTextView;
+    private IconButton dateButton;
     private TextView acceptedCountTextView;
     private TextView deliveredCountTextView;
     private TextView codCountTextView;
     private TextView cashCodCountTextView;
     private TextView cashCollectedTextView;
 
-    private int position = 0;
     private ArrayList<Orderdatum> orderdatumArrayList;
-    private ArrayList<Date> datesArrayList;
-    private ArrayList<String> datesStringArrayList;
+
+    private DatePickerDialog datePickerDialog;
+    private Calendar calendar = Calendar.getInstance();
+    private int year = calendar.get(Calendar.YEAR);
+    private int month = calendar.get(Calendar.MONTH);
+    private int day = calendar.get(Calendar.DAY_OF_MONTH);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +73,20 @@ public class SummaryActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //drawLineChart();
+        datePickerDialog = new DatePickerDialog(this, this, year, month, day);
+        datePickerDialog.setCanceledOnTouchOutside(false);
+        datePickerDialog.setCancelable(false);
 
-        previousDate = (IconButton) findViewById(R.id.previous_date);
-        nextDate = (IconButton) findViewById(R.id.next_date);
-        date = (TextView) findViewById(R.id.date);
+        selectedDateTextView = (TextView) findViewById(R.id.selected_date);
+        dateButton = (IconButton) findViewById(R.id.date_button);
+        dateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                datePickerDialog.show();
+            }
+        });
+
         acceptedCountTextView = (TextView) findViewById(R.id.accepted_count);
         deliveredCountTextView = (TextView) findViewById(R.id.delivered_count);
         codCountTextView = (TextView) findViewById(R.id.cod_count);
@@ -79,86 +94,14 @@ public class SummaryActivity extends AppCompatActivity {
         cashCollectedTextView = (TextView) findViewById(R.id.cash_collected);
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
-
         orderdatumArrayList = new ArrayList<>();
-
         orderdatumArrayList.addAll(CouchBaseHelper.getAllAcceptedOrders(database));
         orderdatumArrayList.addAll(CouchBaseHelper.getAllDeliveredOrders(database));
         orderdatumArrayList.addAll(CouchBaseHelper.getAllFailedOrders(database));
 
+        selectedDateTextView.setText(Util.getCurrentDate());
+        showData(Util.getCurrentDate());
 
-        datesStringArrayList = new ArrayList<>();
-
-        for (Orderdatum orderdatum : orderdatumArrayList) {
-
-            if (!datesStringArrayList.contains(orderdatum.getActionDate()))
-                datesStringArrayList.add(orderdatum.getActionDate());
-
-            if (!datesStringArrayList.contains(orderdatum.getAcceptedDate()))
-                datesStringArrayList.add(orderdatum.getAcceptedDate());
-        }
-
-        for (String d : datesStringArrayList) {
-            Log.d("DATE", "Date : " + d);
-        }
-
-        datesArrayList = new ArrayList<>();
-
-        for (String dateString : datesStringArrayList) {
-
-            try {
-
-                Date date = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).parse(dateString);
-
-                datesArrayList.add(date);
-
-            } catch (ParseException e) {
-
-                e.printStackTrace();
-
-            }
-
-        }
-
-        Collections.sort(datesArrayList, new Comparator<Date>() {
-            @Override
-            public int compare(Date o1, Date o2) {
-                return o1.compareTo(o2);
-            }
-        });
-
-
-        if (datesArrayList.size() != 0) {
-
-            date.setText(new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).format(datesArrayList.get(0)));
-            showData(new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).format(datesArrayList.get(position)));
-
-            previousDate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (position != 0) {
-                        --position;
-                        date.setText(new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).format(datesArrayList.get(position)));
-
-                        showData(new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).format(datesArrayList.get(position)));
-
-                    }
-                }
-            });
-
-            nextDate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if (position != (datesArrayList.size() - 1)) {
-                        ++position;
-                        date.setText(new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).format(datesArrayList.get(position)));
-
-                        showData(new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).format(datesArrayList.get(position)));
-                    }
-                }
-            });
-        }
     }
 
     private void showData(String date) {
@@ -168,8 +111,9 @@ public class SummaryActivity extends AppCompatActivity {
 
         for (Orderdatum orderdatum : orderdatumArrayList) {
 
-            if (orderdatum.getAcceptedDate().equals(date))
-                ++acceptedCount;
+            if (!orderdatum.getAcceptedDate().equals(""))
+                if (orderdatum.getAcceptedDate().equals(date))
+                    ++acceptedCount;
         }
 
         acceptedCountTextView.setText(String.valueOf(acceptedCount));
@@ -181,8 +125,9 @@ public class SummaryActivity extends AppCompatActivity {
 
         for (Orderdatum orderdatum : CouchBaseHelper.getAllDeliveredOrders(database)) {
 
-            if (orderdatum.getActionDate().equals(date))
-                ++deliveredCount;
+            if (!orderdatum.getAcceptedDate().equals(""))
+                if (orderdatum.getAcceptedDate().equals(date))
+                    ++deliveredCount;
         }
 
         deliveredCountTextView.setText(String.valueOf(deliveredCount));
@@ -192,8 +137,9 @@ public class SummaryActivity extends AppCompatActivity {
 
         for (Orderdatum orderdatum : CouchBaseHelper.getAllDeliveredOrders(database)) {
 
-            if (orderdatum.getActionDate().equals(date) && orderdatum.getMethod().equals(CouchBaseHelper.PAYMENT_COD))
-                ++codCount;
+            if (!orderdatum.getAcceptedDate().equals(""))
+                if (orderdatum.getAcceptedDate().equals(date) && orderdatum.getMethod().equals(CouchBaseHelper.PAYMENT_COD))
+                    ++codCount;
         }
 
         codCountTextView.setText(String.valueOf(codCount));
@@ -204,13 +150,15 @@ public class SummaryActivity extends AppCompatActivity {
 
         for (Orderdatum orderdatum : CouchBaseHelper.getAllDeliveredOrders(database)) {
 
-            if (orderdatum.getActionDate().equals(date) && orderdatum.getMethod().equals(CouchBaseHelper.PAYMENT_COD) &&
-                    orderdatum.getPayMode().equals(CouchBaseHelper.PAY_MODE_CASH)) {
-                ++cashCodCount;
-                cashCollected += Integer.parseInt(orderdatum.getTotal());
+            if (!orderdatum.getAcceptedDate().equals(""))
+                if (orderdatum.getAcceptedDate().equals(date) && orderdatum.getMethod().equals(CouchBaseHelper.PAYMENT_COD) &&
+                        orderdatum.getPayMode().equals(CouchBaseHelper.PAY_MODE_CASH)) {
+                    ++cashCodCount;
+                    cashCollected += Integer.parseInt(orderdatum.getTotal());
 
-            }
+                }
         }
+
         cashCodCountTextView.setText(String.valueOf(cashCodCount));
         cashCollectedTextView.setText(String.valueOf(cashCollected));
     }
@@ -386,5 +334,16 @@ public class SummaryActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        calendar.set(year, month, dayOfMonth);
+
+        SimpleDateFormat format = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
+        String date = format.format(calendar.getTime());
+
+        selectedDateTextView.setText(date);
+        showData(date);
     }
 }
