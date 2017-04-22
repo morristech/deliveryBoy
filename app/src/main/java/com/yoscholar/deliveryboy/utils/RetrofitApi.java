@@ -2,6 +2,7 @@ package com.yoscholar.deliveryboy.utils;
 
 
 import com.yoscholar.deliveryboy.retrofitPojo.acceptAnOrder.AcceptOrder;
+import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Status;
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
 import com.yoscholar.deliveryboy.retrofitPojo.reDeliver.ReDeliver;
@@ -102,5 +103,11 @@ public class RetrofitApi {
                 @Field("token") String token
         );
 
+        @FormUrlEncoded
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=getShipIdsStatus")
+        Call<Status> getShipIdsStatus(
+                @Field("order_ship_ids") String orderShipIdsJsonArray,
+                @Field("token") String token
+        );
     }
 }
