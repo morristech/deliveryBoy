@@ -15,20 +15,20 @@ import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.DeliveredOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.utils.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 
 public class DeliveredOrdersActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Toolbar toolbar;
     private ListView deliveredOrdersListView;
 
-    private ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+    private ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
 
     private DatePickerDialog datePickerDialog;
     private Calendar calendar = Calendar.getInstance();
@@ -58,7 +58,7 @@ public class DeliveredOrdersActivity extends AppCompatActivity implements DatePi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
-        orderdatumArrayList = CouchBaseHelper.getAllDeliveredOrders(database);
+        orderMapArrayList = CouchBaseHelper.getAllDeliveredOrders(database);
 
         deliveredOrdersListView = (ListView) findViewById(R.id.delivered_orders_list_view);
 
@@ -81,16 +81,16 @@ public class DeliveredOrdersActivity extends AppCompatActivity implements DatePi
 
     private void displayAcceptedOrdersInListView(String date) {
 
-        ArrayList<Orderdatum> filteredOrderdatumArrayList = new ArrayList<>();
+        ArrayList<Map<String, Object>> filteredOrderMapArrayList = new ArrayList<>();
 
-        for (Orderdatum orderdatum : orderdatumArrayList) {
+        for (Map<String, Object> orderMap : orderMapArrayList) {
 
-            if (!orderdatum.getAcceptedDate().equals(""))
-                if (orderdatum.getAcceptedDate().equals(date))
-                    filteredOrderdatumArrayList.add(orderdatum);
+            if (!orderMap.get(CouchBaseHelper.ACCEPTED_DATE).toString().equals(""))
+                if (orderMap.get(CouchBaseHelper.ACCEPTED_DATE).toString().equals(date))
+                    filteredOrderMapArrayList.add(orderMap);
         }
 
-        DeliveredOrdersListViewAdapter deliveredOrdersListViewAdapter = new DeliveredOrdersListViewAdapter(DeliveredOrdersActivity.this, filteredOrderdatumArrayList);
+        DeliveredOrdersListViewAdapter deliveredOrdersListViewAdapter = new DeliveredOrdersListViewAdapter(DeliveredOrdersActivity.this, filteredOrderMapArrayList);
 
         deliveredOrdersListView.setAdapter(deliveredOrdersListViewAdapter);
 

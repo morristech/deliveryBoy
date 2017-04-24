@@ -12,13 +12,14 @@ import android.widget.Toast;
 
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -33,16 +34,16 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
 
     private static final int MY_REQUEST_CODE = 967;
     private Context context;
-    private ArrayList<Orderdatum> orderdatumArrayList;
+    private ArrayList<Map<String, Object>> orderMapArrayList;
 
-    public AcceptedOrdersListViewAdapter(Context context, ArrayList<Orderdatum> orderdatumArrayList) {
+    public AcceptedOrdersListViewAdapter(Context context, ArrayList<Map<String, Object>> orderMapArrayList) {
         this.context = context;
-        this.orderdatumArrayList = orderdatumArrayList;
+        this.orderMapArrayList = orderMapArrayList;
     }
 
     @Override
     public int getCount() {
-        return orderdatumArrayList.size();
+        return orderMapArrayList.size();
     }
 
     @Override
@@ -66,25 +67,25 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText(orderdatumArrayList.get(position).getIncrementId());
+        incrementId.setText(orderMapArrayList.get(position).get(CouchBaseHelper.INCREMENT_ID).toString());
 
         TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
-        orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
+        orderShipId.setText(orderMapArrayList.get(position).get(CouchBaseHelper.ORDER_SHIP_ID).toString());
 
-        TextView paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
-        paymentMethod.setText(orderdatumArrayList.get(position).getMethod());
+        TextView paymentMethod = (TextView) convertView.findViewById(R.id.pay_mode);
+        paymentMethod.setText(orderMapArrayList.get(position).get(CouchBaseHelper.METHOD).toString());
 
         TextView customerName = (TextView) convertView.findViewById(R.id.customer_name);
-        customerName.setText(orderdatumArrayList.get(position).getCustomerName());
+        customerName.setText(orderMapArrayList.get(position).get(CouchBaseHelper.CUSTOMER_NAME).toString());
 
         TextView address = (TextView) convertView.findViewById(R.id.address);
-        address.setText(orderdatumArrayList.get(position).getAddress() + ", " + orderdatumArrayList.get(position).getCity() + ", " + orderdatumArrayList.get(position).getPincode());
+        address.setText(orderMapArrayList.get(position).get(CouchBaseHelper.ADDRESS).toString() + ", " + orderMapArrayList.get(position).get(CouchBaseHelper.CITY).toString() + ", " + orderMapArrayList.get(position).get(CouchBaseHelper.PINCODE).toString());
 
         IconButton call = (IconButton) convertView.findViewById(R.id.call);
         call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String uri = "tel:" + orderdatumArrayList.get(position).getPhone();
+                String uri = "tel:" + orderMapArrayList.get(position).get(CouchBaseHelper.PHONE).toString();
                 Intent intent = new Intent(Intent.ACTION_CALL);
                 intent.setData(Uri.parse(uri));
                 context.startActivity(intent);
@@ -98,8 +99,8 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 //Toast.makeText(context, "To Do", Toast.LENGTH_SHORT).show();
-                String message = "Dear Customer, we tried reaching you to deliver your order " + orderdatumArrayList.get(position).getIncrementId() + ". Please call 1860 212 1860 to reschedule the delivery.";
-                sendMessage(orderdatumArrayList.get(position).getPhone(), message);
+                String message = "Dear Customer, we tried reaching you to deliver your order " + orderMapArrayList.get(position).get(CouchBaseHelper.INCREMENT_ID).toString() + ". Please call 1860 212 1860 to reschedule the delivery.";
+                sendMessage(orderMapArrayList.get(position).get(CouchBaseHelper.PHONE).toString(), message);
             }
         });
 
@@ -108,7 +109,7 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                EventBus.getDefault().post(orderdatumArrayList.get(position));
+                EventBus.getDefault().post(orderMapArrayList.get(position));
 
             }
         });
@@ -121,7 +122,7 @@ public class AcceptedOrdersListViewAdapter extends BaseAdapter {
                 String uri = String.format(
                         Locale.ENGLISH,
                         "http://maps.google.com/maps?daddr=%s",
-                        orderdatumArrayList.get(position).getAddress() + ", " + orderdatumArrayList.get(position).getCity() + ", " + orderdatumArrayList.get(position).getPincode());
+                        orderMapArrayList.get(position).get(CouchBaseHelper.ADDRESS).toString() + ", " + orderMapArrayList.get(position).get(CouchBaseHelper.CITY).toString() + ", " + orderMapArrayList.get(position).get(CouchBaseHelper.PINCODE).toString());
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
 

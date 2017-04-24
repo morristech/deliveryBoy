@@ -6,16 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.couchbase.lite.Database;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.AcceptedOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -24,6 +20,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 
 public class DeliverOrdersActivity extends AppCompatActivity {
 
@@ -42,7 +39,7 @@ public class DeliverOrdersActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ListView normalOrdersListView;
 
-    private ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+    private ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
     AcceptedOrdersListViewAdapter acceptedOrdersListViewAdapter = null;
 
 
@@ -68,63 +65,24 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
         Database database = CouchBaseHelper.openCouchBaseDB(DeliverOrdersActivity.this);
 
-        orderdatumArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
+        orderMapArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
 
-        Collections.sort(orderdatumArrayList, new Comparator<Orderdatum>() {
+        Collections.sort(orderMapArrayList, new Comparator<Map<String, Object>>() {
             @Override
-            public int compare(Orderdatum o1, Orderdatum o2) {
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
 
-                return o1.getIncrementId().compareTo(o2.getIncrementId());
+                return o1.get(CouchBaseHelper.INCREMENT_ID).toString().compareTo(o2.get(CouchBaseHelper.INCREMENT_ID).toString());
+
             }
+
         });
 
         displayAcceptedOrdersInListView();
     }
 
-/*
-    private void makeNetworkRequest() {
-
-        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
-
-        Call<AcceptOrders> normalOrdersCall = apiInterface.ordersToAccept(
-                AppPreference.getString(DeliverOrdersActivity.this, AppPreference.NAME),//db name
-                AppPreference.getString(DeliverOrdersActivity.this, AppPreference.TOKEN)//jwt token
-        );
-
-        normalOrdersCall.enqueue(new Callback<AcceptOrders>() {
-
-            @Override
-            public void onResponse(Call<AcceptOrders> call, Response<AcceptOrders> response) {
-
-                progressDialog.dismiss();
-
-                if (response.isSuccessful()) {
-
-                    displayAcceptedOrdersInListView(response.body());
-
-                } else {
-
-                    Toast.makeText(DeliverOrdersActivity.this, "Some Error", Toast.LENGTH_SHORT).show();
-
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<AcceptOrders> call, Throwable t) {
-
-                progressDialog.dismiss();
-                Toast.makeText(DeliverOrdersActivity.this, "Network problem", Toast.LENGTH_SHORT).show();
-                //Log.d("VICKY", call.request().url().toString());
-
-            }
-        });
-    }
-*/
-
     private void displayAcceptedOrdersInListView() {
 
-        acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderdatumArrayList);
+        acceptedOrdersListViewAdapter = new AcceptedOrdersListViewAdapter(DeliverOrdersActivity.this, orderMapArrayList);
 
         normalOrdersListView.setAdapter(acceptedOrdersListViewAdapter);
 
@@ -162,14 +120,14 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
                 //get new data from db
                 Database database = CouchBaseHelper.openCouchBaseDB(DeliverOrdersActivity.this);
-                orderdatumArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
+                orderMapArrayList = CouchBaseHelper.getAllAcceptedOrders(database);
 
                 //refresh the list with new data
                 displayAcceptedOrdersInListView();
 
-                Log.d(TAG, "data : " + orderdatumArrayList);
+                Log.d(TAG, "data : " + orderMapArrayList);
 
-               // Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(this, "Caught", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -190,22 +148,22 @@ public class DeliverOrdersActivity extends AppCompatActivity {
 
     //called form the AcceptedOrdersListViewAdapter
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDeliverButtonClick(Orderdatum orderdatum) {
+    public void onDeliverButtonClick(Map<String, Object> orderMap) {
 
-        goToOrderDetailsActivity(orderdatum);
+        goToOrderDetailsActivity(orderMap);
     }
 
-    private void goToOrderDetailsActivity(Orderdatum orderdatum) {
+    private void goToOrderDetailsActivity(Map<String, Object> orderMap) {
         Intent intent = new Intent(DeliverOrdersActivity.this, OrderDetailsActivity.class);
 
-        intent.putExtra(DeliverOrdersActivity.INCREMENT_ID, orderdatum.getIncrementId());
-        intent.putExtra(DeliverOrdersActivity.ORDER_ID, orderdatum.getOrderId());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_NAME, orderdatum.getCustomerName());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PHONE, orderdatum.getPhone());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS, orderdatum.getAddress() + ", " + orderdatum.getCity() + ", " + orderdatum.getPincode());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD, orderdatum.getMethod());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_TOTAL, orderdatum.getTotal());
-        intent.putExtra(DeliverOrdersActivity.ORDER_SHIP_ID, orderdatum.getOrdershipid());
+        intent.putExtra(DeliverOrdersActivity.INCREMENT_ID, orderMap.get(CouchBaseHelper.INCREMENT_ID).toString());
+        intent.putExtra(DeliverOrdersActivity.ORDER_ID, orderMap.get(CouchBaseHelper.ORDER_ID).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_NAME, orderMap.get(CouchBaseHelper.CUSTOMER_NAME).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PHONE, orderMap.get(CouchBaseHelper.PHONE).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS, orderMap.get(CouchBaseHelper.ADDRESS) + ", " + orderMap.get(CouchBaseHelper.CITY) + ", " + orderMap.get(CouchBaseHelper.PINCODE));
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD, orderMap.get(CouchBaseHelper.METHOD).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_TOTAL, orderMap.get(CouchBaseHelper.TOTAL).toString());
+        intent.putExtra(DeliverOrdersActivity.ORDER_SHIP_ID, orderMap.get(CouchBaseHelper.ORDER_SHIP_ID).toString());
         intent.putExtra(DeliverOrdersActivity.CALLED_FROM, DeliverOrdersActivity.class.getSimpleName());
 
         startActivityForResult(intent, MY_REQUEST_CODE);

@@ -16,7 +16,6 @@ import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.pojo.FailedOrderDeleted;
 import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Stat;
 import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Status;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
@@ -28,6 +27,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +41,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
 
-    private ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+    private ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +71,8 @@ public class FailedOrdersActivity extends AppCompatActivity {
         JSONArray orderShipIdsJsonArray = new JSONArray();
         Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
 
-        for (Orderdatum orderdatum : CouchBaseHelper.getAllFailedOrders(database))
-            orderShipIdsJsonArray.put(orderdatum.getOrdershipid());
+        for (Map<String, Object> orderMap : CouchBaseHelper.getAllFailedOrders(database))
+            orderShipIdsJsonArray.put(orderMap.get(CouchBaseHelper.ORDER_SHIP_ID).toString());
 
         if (orderShipIdsJsonArray.length() != 0)
             getShipIdsStatus(orderShipIdsJsonArray);
@@ -146,17 +146,18 @@ public class FailedOrdersActivity extends AppCompatActivity {
     private void displayFailedOrdersInListView() {
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
-        orderdatumArrayList = CouchBaseHelper.getAllFailedOrders(database);
+        orderMapArrayList = CouchBaseHelper.getAllFailedOrders(database);
 
-        Collections.sort(orderdatumArrayList, new Comparator<Orderdatum>() {
+        Collections.sort(orderMapArrayList, new Comparator<Map<String, Object>>() {
             @Override
-            public int compare(Orderdatum o1, Orderdatum o2) {
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
 
-                return o1.getIncrementId().compareTo(o2.getIncrementId());
+                return o1.get(CouchBaseHelper.INCREMENT_ID).toString().compareTo(o2.get(CouchBaseHelper.INCREMENT_ID).toString());
+
             }
         });
 
-        FailedOrdersListViewAdapter failedOrdersListViewAdapter = new FailedOrdersListViewAdapter(FailedOrdersActivity.this, orderdatumArrayList);
+        FailedOrdersListViewAdapter failedOrdersListViewAdapter = new FailedOrdersListViewAdapter(FailedOrdersActivity.this, orderMapArrayList);
 
         failedOrdersListView.setAdapter(failedOrdersListViewAdapter);
 
@@ -187,7 +188,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
 
                 //get new data from db
                 Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
-                orderdatumArrayList = CouchBaseHelper.getAllFailedOrders(database);
+                orderMapArrayList = CouchBaseHelper.getAllFailedOrders(database);
 
                 //refresh the list with new data
                 displayFailedOrdersInListView();
@@ -212,22 +213,22 @@ public class FailedOrdersActivity extends AppCompatActivity {
 
     //called form the FailedOrdersListViewAdapter
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDeliverButtonClick(Orderdatum orderdatum) {
+    public void onDeliverButtonClick(Map<String, Object> orderMap) {
 
-        goToOrderDetailsActivity(orderdatum);
+        goToOrderDetailsActivity(orderMap);
     }
 
-    private void goToOrderDetailsActivity(Orderdatum orderdatum) {
+    private void goToOrderDetailsActivity(Map<String, Object> orderMap) {
         Intent intent = new Intent(FailedOrdersActivity.this, OrderDetailsActivity.class);
 
-        intent.putExtra(DeliverOrdersActivity.INCREMENT_ID, orderdatum.getIncrementId());
-        intent.putExtra(DeliverOrdersActivity.ORDER_ID, orderdatum.getOrderId());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_NAME, orderdatum.getCustomerName());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PHONE, orderdatum.getPhone());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS, orderdatum.getAddress() + ", " + orderdatum.getCity() + ", " + orderdatum.getPincode());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD, orderdatum.getMethod());
-        intent.putExtra(DeliverOrdersActivity.CUSTOMER_TOTAL, orderdatum.getTotal());
-        intent.putExtra(DeliverOrdersActivity.ORDER_SHIP_ID, orderdatum.getOrdershipid());
+        intent.putExtra(DeliverOrdersActivity.INCREMENT_ID, orderMap.get(CouchBaseHelper.INCREMENT_ID).toString());
+        intent.putExtra(DeliverOrdersActivity.ORDER_ID, orderMap.get(CouchBaseHelper.ORDER_ID).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_NAME, orderMap.get(CouchBaseHelper.CUSTOMER_NAME).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PHONE, orderMap.get(CouchBaseHelper.PHONE).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS, orderMap.get(CouchBaseHelper.ADDRESS) + ", " + orderMap.get(CouchBaseHelper.CITY) + ", " + orderMap.get(CouchBaseHelper.PINCODE));
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_PAYMENT_METHOD, orderMap.get(CouchBaseHelper.METHOD).toString());
+        intent.putExtra(DeliverOrdersActivity.CUSTOMER_TOTAL, orderMap.get(CouchBaseHelper.TOTAL).toString());
+        intent.putExtra(DeliverOrdersActivity.ORDER_SHIP_ID, orderMap.get(CouchBaseHelper.ORDER_SHIP_ID).toString());
         intent.putExtra(DeliverOrdersActivity.CALLED_FROM, FailedOrdersActivity.class.getSimpleName());
 
         startActivityForResult(intent, MY_REQUEST_CODE);
@@ -241,7 +242,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
 
             //get new data from db
             Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
-            orderdatumArrayList = CouchBaseHelper.getAllFailedOrders(database);
+            orderMapArrayList = CouchBaseHelper.getAllFailedOrders(database);
 
             //refresh the list with new data
             displayFailedOrdersInListView();

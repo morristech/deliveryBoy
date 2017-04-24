@@ -60,6 +60,11 @@
             android:name=".activity.SummaryActivity"
             android:label="Summary"
             android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".service.DeliveredOrdersService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

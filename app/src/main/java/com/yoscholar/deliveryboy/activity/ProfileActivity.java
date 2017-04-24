@@ -15,6 +15,7 @@ import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -62,20 +63,20 @@ public class ProfileActivity extends AppCompatActivity {
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
 
-        ArrayList<Orderdatum> acceptedOrderdatumArrayList = new ArrayList<>();
-        acceptedOrderdatumArrayList.addAll(CouchBaseHelper.getAllAcceptedOrders(database));
+        ArrayList<Map<String, Object>> acceptedOrderMapArrayList = new ArrayList<>();
+        acceptedOrderMapArrayList.addAll(CouchBaseHelper.getAllAcceptedOrders(database));
 
-        ArrayList<Orderdatum> deliveredOrderdatumArrayList = new ArrayList<>();
-        deliveredOrderdatumArrayList.addAll(CouchBaseHelper.getAllDeliveredOrders(database));
+        ArrayList<Map<String, Object>> deliveredOrderMapArrayList = new ArrayList<>();
+        deliveredOrderMapArrayList.addAll(CouchBaseHelper.getAllDeliveredOrders(database));
 
-        ArrayList<Orderdatum> failedOrderdatumArrayList = new ArrayList<>();
-        failedOrderdatumArrayList.addAll(CouchBaseHelper.getAllFailedOrders(database));
+        ArrayList<Map<String, Object>> failedOrderMapArrayList = new ArrayList<>();
+        failedOrderMapArrayList.addAll(CouchBaseHelper.getAllFailedOrders(database));
 
-        acceptedDeliveries.setText(String.valueOf((acceptedOrderdatumArrayList.size() + deliveredOrderdatumArrayList.size() + failedOrderdatumArrayList.size())));
+        acceptedDeliveries.setText(String.valueOf((acceptedOrderMapArrayList.size() + deliveredOrderMapArrayList.size() + failedOrderMapArrayList.size())));
 
-        successfulDeliveries.setText(String.valueOf(deliveredOrderdatumArrayList.size()));
+        successfulDeliveries.setText(String.valueOf(deliveredOrderMapArrayList.size()));
 
-        failedDeliveries.setText(String.valueOf(failedOrderdatumArrayList.size()));
+        failedDeliveries.setText(String.valueOf(failedOrderMapArrayList.size()));
     }
 
     @Override

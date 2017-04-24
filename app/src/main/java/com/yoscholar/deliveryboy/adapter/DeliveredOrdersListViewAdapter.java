@@ -9,9 +9,9 @@ import android.widget.TextView;
 
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by agrim on 27/2/17.
@@ -21,16 +21,16 @@ public class DeliveredOrdersListViewAdapter extends BaseAdapter {
 
     private static final int MY_REQUEST_CODE = 967;
     private Context context;
-    private ArrayList<Orderdatum> orderdatumArrayList;
+    private ArrayList<Map<String, Object>> orderMapArrayList;
 
-    public DeliveredOrdersListViewAdapter(Context context, ArrayList<Orderdatum> orderdatumArrayList) {
+    public DeliveredOrdersListViewAdapter(Context context, ArrayList<Map<String, Object>> orderMapArrayList) {
         this.context = context;
-        this.orderdatumArrayList = orderdatumArrayList;
+        this.orderMapArrayList = orderMapArrayList;
     }
 
     @Override
     public int getCount() {
-        return orderdatumArrayList.size();
+        return orderMapArrayList.size();
     }
 
     @Override
@@ -54,19 +54,21 @@ public class DeliveredOrdersListViewAdapter extends BaseAdapter {
         }
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
-        incrementId.setText(orderdatumArrayList.get(position).getIncrementId());
+        incrementId.setText(orderMapArrayList.get(position).get(CouchBaseHelper.INCREMENT_ID).toString());
 
         TextView orderShipId = (TextView) convertView.findViewById(R.id.order_ship_id);
-        orderShipId.setText(orderdatumArrayList.get(position).getOrdershipid());
+        orderShipId.setText(orderMapArrayList.get(position).get(CouchBaseHelper.ORDER_SHIP_ID).toString());
 
-        TextView payMode = (TextView) convertView.findViewById(R.id.payment_method);
-        if (orderdatumArrayList.get(position).getMethod().equals(CouchBaseHelper.PAYMENT_COD))
-            payMode.setText(orderdatumArrayList.get(position).getPayMode() + " : " + orderdatumArrayList.get(position).getTotal());
+        TextView payMode = (TextView) convertView.findViewById(R.id.pay_mode);
+        if (orderMapArrayList.get(position).get(CouchBaseHelper.METHOD).toString().equals(CouchBaseHelper.PAYMENT_COD))
+
+            payMode.setText(orderMapArrayList.get(position).get(CouchBaseHelper.PAY_MODE).toString() + " : " + orderMapArrayList.get(position).get(CouchBaseHelper.TOTAL).toString());
         else
-            payMode.setText(orderdatumArrayList.get(position).getActionDate());
+
+            payMode.setText(orderMapArrayList.get(position).get(CouchBaseHelper.PAY_MODE).toString());
 
         TextView actionDate = (TextView) convertView.findViewById(R.id.action_date);
-        actionDate.setText(orderdatumArrayList.get(position).getActionDate());
+        actionDate.setText(orderMapArrayList.get(position).get(CouchBaseHelper.ACTION_DATE).toString());
 
         return convertView;
     }

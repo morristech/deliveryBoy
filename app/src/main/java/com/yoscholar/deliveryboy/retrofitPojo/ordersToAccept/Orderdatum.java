@@ -42,15 +42,7 @@ public class Orderdatum {
     @SerializedName("accept_status")
     @Expose
     private String acceptStatus;
-    @SerializedName("action_date")
-    @Expose
-    private String actionDate;
-    @SerializedName("accepted_date")
-    @Expose
-    private String acceptedDate;
-    @SerializedName("pay_mode")
-    @Expose
-    private String payMode;
+
 
     public String getIncrementId() {
         return incrementId;
@@ -147,29 +139,4 @@ public class Orderdatum {
     public void setAcceptStatus(String acceptStatus) {
         this.acceptStatus = acceptStatus;
     }
-
-    public String getActionDate() {
-        return actionDate;
-    }
-
-    public void setActionDate(String actionDate) {
-        this.actionDate = actionDate;
-    }
-
-    public String getAcceptedDate() {
-        return acceptedDate;
-    }
-
-    public void setAcceptedDate(String acceptedDate) {
-        this.acceptedDate = acceptedDate;
-    }
-
-    public String getPayMode() {
-        return payMode;
-    }
-
-    public void setPayMode(String payMode) {
-        this.payMode = payMode;
-    }
-
 }

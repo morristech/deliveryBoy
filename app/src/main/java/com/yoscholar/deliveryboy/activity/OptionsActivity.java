@@ -17,6 +17,7 @@ import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.IoniconsIcons;
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.service.DeliveredOrdersService;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 
 public class OptionsActivity extends AppCompatActivity {
@@ -175,5 +176,13 @@ public class OptionsActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        startService(new Intent(OptionsActivity.this, DeliveredOrdersService.class));
     }
 }

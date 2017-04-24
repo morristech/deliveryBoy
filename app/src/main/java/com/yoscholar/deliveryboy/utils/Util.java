@@ -30,7 +30,7 @@ public class Util {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
-    public static String generateOrderId() {
+    public static String generateCommentId() {
         int size = 6;
         char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
         StringBuilder sb = new StringBuilder();

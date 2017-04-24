@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,23 +26,15 @@ import android.widget.Toast;
 import com.couchbase.lite.Database;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
-import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
-import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
-import com.yoscholar.deliveryboy.utils.AppPreference;
-import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.Map;
 
 public class OrderDetailsActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String DELIVERED = "Delivered";
-    private static final String RE_DELIVER = "Re-Deliver";
+    private static final String FAILED = "Failed";
 
     private Toolbar toolbar;
 
@@ -55,10 +46,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
     private TextView total;
 
     private Button deliverySuccessfulButton;
-    private Button deliveryExceptionButton;
-    private final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 100;
-
-    private ProgressDialog progressDialog;
+    private Button deliveryFailedButton;
 
     private FrameLayout orderContainer;
     private LinearLayout exceptionReasonContainer;
@@ -102,12 +90,6 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         orderContainer = (FrameLayout) findViewById(R.id.order_container);
         exceptionReasonContainer = (LinearLayout) findViewById(R.id.exception_reason_container);
         deliverySuccessfulContainer = (LinearLayout) findViewById(R.id.successful_delivery_details_container);
-
-        progressDialog = new ProgressDialog(OrderDetailsActivity.this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Please wait....");
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
 
         incrementId = (TextView) findViewById(R.id.increment_id);
         orderShipId = (TextView) findViewById(R.id.order_ship_id);
@@ -204,7 +186,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
                 RadioButton checkedRadioButton = (RadioButton) findViewById(deliveryExceptionRadioGroup.getCheckedRadioButtonId());
 
-                String reason;
+                String reason;//failure reason
 
                 if (!TextUtils.isEmpty(otherReasonEditText.getText().toString()))
                     reason = checkedRadioButton.getText().toString() + " : " + otherReasonEditText.getText().toString();
@@ -221,15 +203,15 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
                     } else {
 
                         Toast.makeText(OrderDetailsActivity.this, "Reason : " + reason, Toast.LENGTH_SHORT).show();
-                        progressDialog.show();
-                        updateOrder(RE_DELIVER, reason);
+
+                        checkTheResponseAndProceed(FAILED, reason);
                     }
 
                 } else {
 
                     Toast.makeText(OrderDetailsActivity.this, "Reason : " + reason, Toast.LENGTH_SHORT).show();
-                    progressDialog.show();
-                    updateOrder(RE_DELIVER, reason);
+
+                    checkTheResponseAndProceed(FAILED, reason);
 
                 }
 
@@ -267,9 +249,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
                 if (validationSuccessfull) {
 
-                    progressDialog.show();
-
-                    updateOrder(DELIVERED, "Collected by : " + nameOfPersonEditText.getText() + "\n Pay Mode : " + payModeArray[payModeSpinner.getSelectedItemPosition()] + "\n Relation : " + relationArray[relationSpinner.getSelectedItemPosition()]);
+                    checkTheResponseAndProceed(DELIVERED, "Collected by : " + nameOfPersonEditText.getText() + "\n Pay Mode : " + payModeArray[payModeSpinner.getSelectedItemPosition()] + "\n Relation : " + relationArray[relationSpinner.getSelectedItemPosition()]);
                 }
             }
         });
@@ -301,22 +281,22 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
             }
         });
 
-        deliveryExceptionButton = (Button) findViewById(R.id.delivery_exception_button);
+        deliveryFailedButton = (Button) findViewById(R.id.delivery_exception_button);
 
         if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
 
-            deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
+            deliveryFailedButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ;
                 }
             });
 
-            deliveryExceptionButton.setBackgroundResource(R.color.colorAccent);
+            deliveryFailedButton.setBackgroundResource(R.color.colorAccent);
 
         } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
 
-            deliveryExceptionButton.setOnClickListener(new View.OnClickListener() {
+            deliveryFailedButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -327,124 +307,43 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
         }
     }
 
-    private void openMapsForNavigation() {
+    private void checkTheResponseAndProceed(String status, String comment) {
 
-        String uri = String.format(
-                Locale.ENGLISH,
-                "http://maps.google.com/maps?daddr=%s",
-                getIntent().getStringExtra(DeliverOrdersActivity.CUSTOMER_ADDRESS));
+        Database database = CouchBaseHelper.openCouchBaseDB(OrderDetailsActivity.this);
+        Map<String, Object> orderMap = null;
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
 
-        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+            orderMap = CouchBaseHelper.getAnAcceptedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
 
-        startActivity(intent);
-    }
+        } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
 
-    private void updateOrder(final String status, String comment) {
+            orderMap = CouchBaseHelper.getAFailedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+        }
 
-        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
+        if (status.equals(DELIVERED)) {
 
-        Call<UpdateOrder> updateOrderCall = apiInterface.updateOrder(
-                getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID),//increment id
-                comment,//comment
-                getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID),//order ship id
-                status,// Delivered / Re-Deliver
-                AppPreference.getString(OrderDetailsActivity.this, AppPreference.NAME),//db name
-                AppPreference.getString(OrderDetailsActivity.this, AppPreference.TOKEN)//jwt token
-        );
+            if (orderMap != null)
+                CouchBaseHelper.saveDeliveredOrderInDB(database, orderMap, payModeArray[payModeSpinner.getSelectedItemPosition()], comment);
 
-        updateOrderCall.enqueue(new Callback<UpdateOrder>() {
+        } else if (status.equals(FAILED)) {
 
-            @Override
-            public void onResponse(Call<UpdateOrder> call, Response<UpdateOrder> response) {
-
-                progressDialog.dismiss();
-
-                if (response.isSuccessful()) {
-
-                    checkTheResponseAndProceed(response.body(), status);
-
-                } else {
-
-                    Toast.makeText(OrderDetailsActivity.this, "Some Error", Toast.LENGTH_SHORT).show();
-
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<UpdateOrder> call, Throwable t) {
-
-                progressDialog.dismiss();
-                Toast.makeText(OrderDetailsActivity.this, "Network problem", Toast.LENGTH_SHORT).show();
-                //Log.d("VICKY", call.request().url().toString());
-
-            }
-        });
-    }
-
-    private void checkTheResponseAndProceed(UpdateOrder updateOrder, String status) {
-
-        if (updateOrder.getStatus().equalsIgnoreCase("success")) {
-
-            Database database = CouchBaseHelper.openCouchBaseDB(OrderDetailsActivity.this);
-            Orderdatum orderdatum = null;
-
-            if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
-
-                orderdatum = CouchBaseHelper.getAnAcceptedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
-
-            } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
-
-                orderdatum = CouchBaseHelper.getAFailedOrder(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
-            }
-
-            if (status.equals(DELIVERED)) {
-
-                if (orderdatum != null)
-                    CouchBaseHelper.saveDeliveredOrderInDB(database, orderdatum, payModeArray[payModeSpinner.getSelectedItemPosition()]);
-
-            } else if (status.equals(RE_DELIVER)) {
-
-                if (orderdatum != null)
-                    CouchBaseHelper.saveFailedOrderInDB(database, orderdatum);
-
-            }
-
-            if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
-                CouchBaseHelper.deleteAnAcceptedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
-            } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
-                CouchBaseHelper.deleteAFailedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
-            }
-
-            Toast.makeText(this, updateOrder.getMessage(), Toast.LENGTH_SHORT).show();
-            setResult(Activity.RESULT_OK);//set result OK
-            finish();// finish the activity
-
-        } else if (updateOrder.getStatus().equalsIgnoreCase("failure")) {
-
-            Toast.makeText(this, updateOrder.getMessage(), Toast.LENGTH_SHORT).show();
-
-            //logout
-            AppPreference.clearPreferencesLogout(OrderDetailsActivity.this);
-
-            //open login screen
-            openLoginScreen();
-
-            finish();// finish the current activity
+            if (orderMap != null)
+                CouchBaseHelper.saveFailedOrderInDB(database, orderMap, comment);
 
         }
 
+        if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(DeliverOrdersActivity.class.getSimpleName())) {
+            CouchBaseHelper.deleteAnAcceptedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+        } else if (getIntent().getStringExtra(DeliverOrdersActivity.CALLED_FROM).equals(FailedOrdersActivity.class.getSimpleName())) {
+            CouchBaseHelper.deleteAFailedOrderFromDB(database, getIntent().getStringExtra(DeliverOrdersActivity.ORDER_SHIP_ID));
+        }
+
+        setResult(Activity.RESULT_OK);//set result OK
+        finish();// finish the activity
+
     }
 
-    private void openLoginScreen() {
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

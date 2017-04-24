@@ -164,7 +164,7 @@ public class AcceptOrdersListViewAdapter extends BaseAdapter {
 
                         if (flag.equals("1"))//save the accepted order in DB
                             saveTheAcceptedOrderInDb(orderdatum);
-                        else if (flag.equals("0"))
+                        else if (flag.equals("0"))////delete the declined order from DB
                             deleteTheAcceptedOrderFromDB(orderdatum);
 
                         //reload the list of orders to accept

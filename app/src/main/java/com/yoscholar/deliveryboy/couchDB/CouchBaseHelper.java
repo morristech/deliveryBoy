@@ -41,8 +41,19 @@ public class CouchBaseHelper {
     public static final String ORDER_SHIP_ID = "ordershipid";
     public static final String ACCEPT_STATUS = "accept_status";
     public static final String ACTION_DATE = "action_date";//refers to accept, deliver or failed action date
-    public static final String PAY_MODE = "pay_mode";//refers to pay mode in case of COD
+    public static final String PAY_MODE = "pay_mode";//refers to pay mode in case of COD or PREPAID
+
+    //PAYMENT METHOD------> COD------------PREPAID
+    //                       |               |
+    //                       |----Cash       |-----Prepaid
+    //                       |----Card
+    //                       |----Cheque
+    //                       |----Wallet
+
     public static final String ACCEPTED_DATE = "accepted_date";
+    private static final String SYNC_STATUS = "sync_status";
+    private static final String COMMENT = "comment";
+    private static final String COMMENT_ID = "comment_id";
 
     //PAYMENT METHODS
     public static final String PAYMENT_COD = "COD";
@@ -53,6 +64,7 @@ public class CouchBaseHelper {
     public static final String PAY_MODE_CARD = "Card";
     public static final String PAY_MODE_CHEQUE = "Cheque";
     public static final String PAY_MODE_WALLET = "Wallet";
+
 
     /**
      * Open database connection
@@ -109,9 +121,8 @@ public class CouchBaseHelper {
         orderMap.put(TOTAL, orderdatum.getTotal());
         orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
         orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
-        orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
-        orderMap.put(ACTION_DATE, orderdatum.getActionDate());
-        orderMap.put(PAY_MODE, orderdatum.getPayMode());
+        orderMap.put(ACCEPT_STATUS, "1");
+        //ADD ACCEPTED_DATE
         orderMap.put(ACCEPTED_DATE, Util.getCurrentDate());
 
         Document document = database.createDocument();
@@ -142,12 +153,12 @@ public class CouchBaseHelper {
      * @param database database
      * @return arrayList containing all accepted orders
      */
-    public static ArrayList<Orderdatum> getAllAcceptedOrders(Database database) {
+    public static ArrayList<Map<String, Object>> getAllAcceptedOrders(Database database) {
 
         Document acceptedOrdersDocument = database.getDocument(ACCEPTED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = acceptedOrdersDocument.getProperties();
 
-        ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+        ArrayList<Map<String, Object>> ordersArrayList = new ArrayList<>();
 
         if (map != null) {
             Iterator it = map.entrySet().iterator();
@@ -159,29 +170,27 @@ public class CouchBaseHelper {
                     //System.out.println(pair.getKey() + " = " + pair.getValue());
                     Document document = database.getDocument(pair.getValue().toString());
 
-                    Orderdatum orderdatum = new Orderdatum();
-                    orderdatum.setIncrementId(document.getProperty(INCREMENT_ID).toString());
-                    orderdatum.setOrderId(document.getProperty(ORDER_ID).toString());
-                    orderdatum.setCustomerName(document.getProperty(CUSTOMER_NAME).toString());
-                    orderdatum.setPhone(document.getProperty(PHONE).toString());
-                    orderdatum.setAddress(document.getProperty(ADDRESS).toString());
-                    orderdatum.setCity(document.getProperty(CITY).toString());
-                    orderdatum.setPincode(document.getProperty(PINCODE).toString());
-                    orderdatum.setMethod(document.getProperty(METHOD).toString());
-                    orderdatum.setTotal(document.getProperty(TOTAL).toString());
-                    orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
-                    orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                    orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
-                    orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
-                    orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
-                    orderdatum.setAcceptedDate(document.getProperty(ACCEPTED_DATE).toString());
+                    Map<String, Object> orderMap = new HashMap<>();
+                    orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                    orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                    orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                    orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                    orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                    orderMap.put(CITY, document.getProperty(CITY).toString());
+                    orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                    orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                    orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                    orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                    orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                    orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                    orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
 
-                    orderdatumArrayList.add(orderdatum);
+                    ordersArrayList.add(orderMap);
                 }
             }
         }
 
-        return orderdatumArrayList;
+        return ordersArrayList;
     }
 
     /**
@@ -189,14 +198,14 @@ public class CouchBaseHelper {
      *
      * @param orderShipId ordersShipId
      * @param database    database
-     * @return accepted order
+     * @return accepted order Map
      */
-    public static Orderdatum getAnAcceptedOrder(Database database, String orderShipId) {
+    public static Map<String, Object> getAnAcceptedOrder(Database database, String orderShipId) {
 
         Document acceptedOrdersDocument = database.getDocument(ACCEPTED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = acceptedOrdersDocument.getProperties();
 
-        Orderdatum orderdatum = null;
+        Map<String, Object> orderMap = null;
 
         if (map != null) {
             Iterator it = map.entrySet().iterator();
@@ -212,29 +221,27 @@ public class CouchBaseHelper {
                         //delete the document
                         Document document = database.getDocument(pair.getValue().toString());
 
-                        orderdatum = new Orderdatum();
-                        orderdatum.setIncrementId(document.getProperty(INCREMENT_ID).toString());
-                        orderdatum.setOrderId(document.getProperty(ORDER_ID).toString());
-                        orderdatum.setCustomerName(document.getProperty(CUSTOMER_NAME).toString());
-                        orderdatum.setPhone(document.getProperty(PHONE).toString());
-                        orderdatum.setAddress(document.getProperty(ADDRESS).toString());
-                        orderdatum.setCity(document.getProperty(CITY).toString());
-                        orderdatum.setPincode(document.getProperty(PINCODE).toString());
-                        orderdatum.setMethod(document.getProperty(METHOD).toString());
-                        orderdatum.setTotal(document.getProperty(TOTAL).toString());
-                        orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
-                        orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                        orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
-                        orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
-                        orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
-                        orderdatum.setAcceptedDate(document.getProperty(ACCEPTED_DATE).toString());
+                        orderMap = new HashMap<>();
+                        orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                        orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                        orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                        orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                        orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                        orderMap.put(CITY, document.getProperty(CITY).toString());
+                        orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                        orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                        orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                        orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                        orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                        orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                        orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
 
                     }
                 }
             }
         }
 
-        return orderdatum;
+        return orderMap;
     }
 
     /**
@@ -315,12 +322,12 @@ public class CouchBaseHelper {
     /**
      * save a delivered order in the DB
      *
-     * @param database   database
-     * @param orderdatum orderdatum
-     * @param payMode    payMode
+     * @param database database
+     * @param orderMap orderMap
+     * @param payMode  payMode
      * @return boolean indicating whether the action was successful or not
      */
-    public static boolean saveDeliveredOrderInDB(Database database, Orderdatum orderdatum, String payMode) {
+    public static boolean saveDeliveredOrderInDB(Database database, Map<String, Object> orderMap, String payMode, String comment) {
 
         Document deliveredOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = new HashMap<>();
@@ -330,22 +337,11 @@ public class CouchBaseHelper {
         if (deliveredOrdersDocument.getProperties() != null)
             map.putAll(deliveredOrdersDocument.getProperties());//put old data from the document in the new map( update )
 
-        Map<String, Object> orderMap = new HashMap<>();
-        orderMap.put(INCREMENT_ID, orderdatum.getIncrementId());
-        orderMap.put(ORDER_ID, orderdatum.getOrderId());
-        orderMap.put(CUSTOMER_NAME, orderdatum.getCustomerName());
-        orderMap.put(PHONE, orderdatum.getPhone());
-        orderMap.put(ADDRESS, orderdatum.getAddress());
-        orderMap.put(CITY, orderdatum.getCity());
-        orderMap.put(PINCODE, orderdatum.getPincode());
-        orderMap.put(METHOD, orderdatum.getMethod());
-        orderMap.put(TOTAL, orderdatum.getTotal());
-        orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
-        orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
-        orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
         orderMap.put(PAY_MODE, payMode);
-        orderMap.put(ACCEPTED_DATE, orderdatum.getAcceptedDate());
+        orderMap.put(SYNC_STATUS, "0");
+        orderMap.put(COMMENT, comment);
+        orderMap.put(COMMENT_ID, Util.generateCommentId());
 
         Document document = database.createDocument();
 
@@ -356,7 +352,7 @@ public class CouchBaseHelper {
             flag = false;
         }
 
-        map.put(orderdatum.getOrdershipid(), document.getId());// ordershipid : document_id
+        map.put(orderMap.get(ORDER_SHIP_ID).toString(), document.getId());// ordershipid : document_id
 
         try {
             deliveredOrdersDocument.putProperties(map);
@@ -372,11 +368,11 @@ public class CouchBaseHelper {
     /**
      * save a failed order in the DB
      *
-     * @param database   database
-     * @param orderdatum orderdatum
+     * @param database database
+     * @param orderMap orderMap
      * @return boolean indicating whether the action was successful or not
      */
-    public static boolean saveFailedOrderInDB(Database database, Orderdatum orderdatum) {
+    public static boolean saveFailedOrderInDB(Database database, Map<String, Object> orderMap, String comment) {
 
         Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = new HashMap<>();
@@ -386,22 +382,10 @@ public class CouchBaseHelper {
         if (failedOrdersDocument.getProperties() != null)
             map.putAll(failedOrdersDocument.getProperties());//put old data from the document in the new map( update )
 
-        Map<String, Object> orderMap = new HashMap<>();
-        orderMap.put(INCREMENT_ID, orderdatum.getIncrementId());
-        orderMap.put(ORDER_ID, orderdatum.getOrderId());
-        orderMap.put(CUSTOMER_NAME, orderdatum.getCustomerName());
-        orderMap.put(PHONE, orderdatum.getPhone());
-        orderMap.put(ADDRESS, orderdatum.getAddress());
-        orderMap.put(CITY, orderdatum.getCity());
-        orderMap.put(PINCODE, orderdatum.getPincode());
-        orderMap.put(METHOD, orderdatum.getMethod());
-        orderMap.put(TOTAL, orderdatum.getTotal());
-        orderMap.put(ORDER_TYPE, orderdatum.getOrdertype());
-        orderMap.put(ORDER_SHIP_ID, orderdatum.getOrdershipid());
-        orderMap.put(ACCEPT_STATUS, orderdatum.getAcceptStatus());
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
-        orderMap.put(PAY_MODE, orderdatum.getPayMode());
-        orderMap.put(ACCEPTED_DATE, orderdatum.getAcceptedDate());
+        orderMap.put(SYNC_STATUS, "0");
+        orderMap.put(COMMENT, comment);
+        orderMap.put(COMMENT_ID, Util.generateCommentId());
 
         Document document = database.createDocument();
 
@@ -412,7 +396,7 @@ public class CouchBaseHelper {
             flag = false;
         }
 
-        map.put(orderdatum.getOrdershipid(), document.getId());// ordershipid : document_id
+        map.put(orderMap.get(ORDER_SHIP_ID).toString(), document.getId());// ordershipid : document_id
 
         try {
             failedOrdersDocument.putProperties(map);
@@ -431,12 +415,12 @@ public class CouchBaseHelper {
      * @param database database
      * @return arrayList containing all delivered orders
      */
-    public static ArrayList<Orderdatum> getAllDeliveredOrders(Database database) {
+    public static ArrayList<Map<String, Object>> getAllDeliveredOrders(Database database) {
 
         Document acceptedOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = acceptedOrdersDocument.getProperties();
 
-        ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+        ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
 
         if (map != null) {
             Iterator it = map.entrySet().iterator();
@@ -448,29 +432,32 @@ public class CouchBaseHelper {
                     //System.out.println(pair.getKey() + " = " + pair.getValue());
                     Document document = database.getDocument(pair.getValue().toString());
 
-                    Orderdatum orderdatum = new Orderdatum();
-                    orderdatum.setIncrementId(document.getProperty(INCREMENT_ID).toString());
-                    orderdatum.setOrderId(document.getProperty(ORDER_ID).toString());
-                    orderdatum.setCustomerName(document.getProperty(CUSTOMER_NAME).toString());
-                    orderdatum.setPhone(document.getProperty(PHONE).toString());
-                    orderdatum.setAddress(document.getProperty(ADDRESS).toString());
-                    orderdatum.setCity(document.getProperty(CITY).toString());
-                    orderdatum.setPincode(document.getProperty(PINCODE).toString());
-                    orderdatum.setMethod(document.getProperty(METHOD).toString());
-                    orderdatum.setTotal(document.getProperty(TOTAL).toString());
-                    orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
-                    orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                    orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
-                    orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
-                    orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
-                    orderdatum.setAcceptedDate(document.getProperty(ACCEPTED_DATE).toString());
+                    Map<String, Object> orderMap = new HashMap<>();
+                    orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                    orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                    orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                    orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                    orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                    orderMap.put(CITY, document.getProperty(CITY).toString());
+                    orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                    orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                    orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                    orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                    orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                    orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                    orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
+                    orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
+                    orderMap.put(PAY_MODE, document.getProperty(PAY_MODE).toString());
+                    orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
+                    orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
+                    orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
 
-                    orderdatumArrayList.add(orderdatum);
+                    orderMapArrayList.add(orderMap);
                 }
             }
         }
 
-        return orderdatumArrayList;
+        return orderMapArrayList;
     }
 
     /**
@@ -479,12 +466,12 @@ public class CouchBaseHelper {
      * @param database database
      * @return arrayList containing all delivered orders
      */
-    public static ArrayList<Orderdatum> getAllFailedOrders(Database database) {
+    public static ArrayList<Map<String, Object>> getAllFailedOrders(Database database) {
 
         Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = failedOrdersDocument.getProperties();
 
-        ArrayList<Orderdatum> orderdatumArrayList = new ArrayList<>();
+        ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
 
         if (map != null) {
             Iterator it = map.entrySet().iterator();
@@ -496,29 +483,31 @@ public class CouchBaseHelper {
                     //System.out.println(pair.getKey() + " = " + pair.getValue());
                     Document document = database.getDocument(pair.getValue().toString());
 
-                    Orderdatum orderdatum = new Orderdatum();
-                    orderdatum.setIncrementId(document.getProperty(INCREMENT_ID).toString());
-                    orderdatum.setOrderId(document.getProperty(ORDER_ID).toString());
-                    orderdatum.setCustomerName(document.getProperty(CUSTOMER_NAME).toString());
-                    orderdatum.setPhone(document.getProperty(PHONE).toString());
-                    orderdatum.setAddress(document.getProperty(ADDRESS).toString());
-                    orderdatum.setCity(document.getProperty(CITY).toString());
-                    orderdatum.setPincode(document.getProperty(PINCODE).toString());
-                    orderdatum.setMethod(document.getProperty(METHOD).toString());
-                    orderdatum.setTotal(document.getProperty(TOTAL).toString());
-                    orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
-                    orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                    orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
-                    orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
-                    orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
-                    orderdatum.setAcceptedDate(document.getProperty(ACCEPTED_DATE).toString());
+                    Map<String, Object> orderMap = new HashMap<>();
+                    orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                    orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                    orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                    orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                    orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                    orderMap.put(CITY, document.getProperty(CITY).toString());
+                    orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                    orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                    orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                    orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                    orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                    orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                    orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
+                    orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
+                    orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
+                    orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
+                    orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
 
-                    orderdatumArrayList.add(orderdatum);
+                    orderMapArrayList.add(orderMap);
                 }
             }
         }
 
-        return orderdatumArrayList;
+        return orderMapArrayList;
     }
 
 
@@ -604,7 +593,6 @@ public class CouchBaseHelper {
             }
         }
 
-
         if (keyToDelete != null) {
 
             //remove entry from acceptedOrdersDocument
@@ -632,14 +620,14 @@ public class CouchBaseHelper {
      *
      * @param database    database
      * @param orderShipId orderShipId
-     * @return failed order
+     * @return failed order Map
      */
-    public static Orderdatum getAFailedOrder(Database database, String orderShipId) {
+    public static Map<String, Object> getAFailedOrder(Database database, String orderShipId) {
 
         Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
         Map<String, Object> map = failedOrdersDocument.getProperties();
 
-        Orderdatum orderdatum = null;
+        Map<String, Object> orderMap = null;
 
         if (map != null) {
             Iterator it = map.entrySet().iterator();
@@ -655,28 +643,30 @@ public class CouchBaseHelper {
                         //delete the document
                         Document document = database.getDocument(pair.getValue().toString());
 
-                        orderdatum = new Orderdatum();
-                        orderdatum.setIncrementId(document.getProperty(INCREMENT_ID).toString());
-                        orderdatum.setOrderId(document.getProperty(ORDER_ID).toString());
-                        orderdatum.setCustomerName(document.getProperty(CUSTOMER_NAME).toString());
-                        orderdatum.setPhone(document.getProperty(PHONE).toString());
-                        orderdatum.setAddress(document.getProperty(ADDRESS).toString());
-                        orderdatum.setCity(document.getProperty(CITY).toString());
-                        orderdatum.setPincode(document.getProperty(PINCODE).toString());
-                        orderdatum.setMethod(document.getProperty(METHOD).toString());
-                        orderdatum.setTotal(document.getProperty(TOTAL).toString());
-                        orderdatum.setOrdertype(document.getProperty(ORDER_TYPE).toString());
-                        orderdatum.setOrdershipid(document.getProperty(ORDER_SHIP_ID).toString());
-                        orderdatum.setAcceptStatus(document.getProperty(ACCEPT_STATUS).toString());
-                        orderdatum.setActionDate(document.getProperty(ACTION_DATE).toString());
-                        orderdatum.setPayMode(document.getProperty(PAY_MODE).toString());
-                        orderdatum.setAcceptedDate(document.getProperty(ACCEPTED_DATE).toString());
+                        orderMap = new HashMap<>();
+                        orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                        orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                        orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                        orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                        orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                        orderMap.put(CITY, document.getProperty(CITY).toString());
+                        orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                        orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                        orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                        orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                        orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                        orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                        orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
+                        orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
+                        orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
+                        orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
+                        orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
 
                     }
                 }
             }
         }
 
-        return orderdatum;
+        return orderMap;
     }
 }
