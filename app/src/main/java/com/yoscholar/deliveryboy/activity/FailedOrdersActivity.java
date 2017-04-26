@@ -1,45 +1,32 @@
 package com.yoscholar.deliveryboy.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.couchbase.lite.Database;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.FailedOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
-import com.yoscholar.deliveryboy.pojo.FailedOrderDeleted;
-import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Stat;
-import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Status;
-import com.yoscholar.deliveryboy.utils.AppPreference;
-import com.yoscholar.deliveryboy.utils.RetrofitApi;
+import com.yoscholar.deliveryboy.pojo.FailedOrdersUpdated;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class FailedOrdersActivity extends AppCompatActivity {
 
     private static final int MY_REQUEST_CODE = 907;
     private Toolbar toolbar;
     private ListView failedOrdersListView;
-    private ProgressDialog progressDialog;
-
 
     private ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
 
@@ -61,86 +48,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
 
         failedOrdersListView = (ListView) findViewById(R.id.failed_orders_list_view);
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Please wait....");
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-
-
-        JSONArray orderShipIdsJsonArray = new JSONArray();
-        Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
-
-        for (Map<String, Object> orderMap : CouchBaseHelper.getAllFailedOrders(database))
-            orderShipIdsJsonArray.put(orderMap.get(CouchBaseHelper.ORDER_SHIP_ID).toString());
-
-        if (orderShipIdsJsonArray.length() != 0)
-            getShipIdsStatus(orderShipIdsJsonArray);
-        else
-            displayFailedOrdersInListView();
-    }
-
-    public void getShipIdsStatus(JSONArray orderShipIdsJsonArray) {
-
-        progressDialog.show();
-
-        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
-        Call<Status> statusCall = apiInterface.getShipIdsStatus(
-                orderShipIdsJsonArray.toString(),
-                AppPreference.getString(this, AppPreference.TOKEN)//jwt token
-        );
-
-        statusCall.enqueue(new Callback<Status>() {
-            @Override
-            public void onResponse(Call<Status> call, Response<Status> response) {
-
-                progressDialog.dismiss();
-
-                if (response.isSuccessful()) {
-
-                    if (response.body().getStatus().equalsIgnoreCase("success")) {
-
-                        Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
-
-                        for (Stat stat : response.body().getStats()) {
-
-                            if (stat.getRstatus().equals("1"))
-                                CouchBaseHelper.deleteAFailedOrderFromDB(database, stat.getOrderShipId());
-
-                        }
-
-                        displayFailedOrdersInListView();
-
-                    } else if (response.body().getStatus().equalsIgnoreCase("failure")) {
-
-                        //show message
-                        Toast.makeText(FailedOrdersActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-
-                        //logout
-                        AppPreference.clearPreferencesLogout(FailedOrdersActivity.this);
-
-                        //open login screen
-                        openLoginScreen();
-
-                        finish();
-
-                    }
-
-                } else {
-
-                    Toast.makeText(FailedOrdersActivity.this, "Some Error.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Status> call, Throwable t) {
-
-                progressDialog.dismiss();
-
-                Toast.makeText(FailedOrdersActivity.this, "Network Error.", Toast.LENGTH_SHORT).show();
-
-            }
-        });
+        displayFailedOrdersInListView();
     }
 
     private void displayFailedOrdersInListView() {
@@ -186,10 +94,6 @@ public class FailedOrdersActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
 
-                //get new data from db
-                Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
-                orderMapArrayList = CouchBaseHelper.getAllFailedOrders(database);
-
                 //refresh the list with new data
                 displayFailedOrdersInListView();
 
@@ -234,7 +138,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
         startActivityForResult(intent, MY_REQUEST_CODE);
 
     }
-
+/*
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onOrderRedelivered(FailedOrderDeleted failedOrderDeleted) {
 
@@ -258,7 +162,7 @@ public class FailedOrdersActivity extends AppCompatActivity {
             finish();
         }
 
-    }
+    }*/
 
     private void openLoginScreen() {
 
@@ -266,6 +170,16 @@ public class FailedOrdersActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
+    }
+
+    //called from FailedOrdersSyncService and FailedOrdersShipIdsStatusService
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFailedOrdersServicesFinished(FailedOrdersUpdated failedOrdersUpdated) {
+
+        if (failedOrdersUpdated.isOrdersUpdated()) {
+
+            displayFailedOrdersInListView();
+        }
     }
 
 }

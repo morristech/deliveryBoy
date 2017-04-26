@@ -15,7 +15,12 @@ import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.adapter.DeliveredOrdersListViewAdapter;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
+import com.yoscholar.deliveryboy.pojo.DeliveredOrdersUpdated;
 import com.yoscholar.deliveryboy.utils.Util;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,10 +81,10 @@ public class DeliveredOrdersActivity extends AppCompatActivity implements DatePi
         });
 
         selectedDateTextView.setText(Util.getCurrentDate());
-        displayAcceptedOrdersInListView(Util.getCurrentDate());
+        displayDeliveredOrdersInListView(Util.getCurrentDate());
     }
 
-    private void displayAcceptedOrdersInListView(String date) {
+    private void displayDeliveredOrdersInListView(String date) {
 
         ArrayList<Map<String, Object>> filteredOrderMapArrayList = new ArrayList<>();
 
@@ -122,6 +127,32 @@ public class DeliveredOrdersActivity extends AppCompatActivity implements DatePi
 
         selectedDateTextView.setText(date);
 
-        displayAcceptedOrdersInListView(date);
+        displayDeliveredOrdersInListView(date);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+
+    //called from DeliveredOrdersSyncService
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeliveredOrdersSyncingFinished(DeliveredOrdersUpdated deliveredOrdersUpdated) {
+
+        if (deliveredOrdersUpdated.isOrdersUpdated()) {
+
+            Database database = CouchBaseHelper.openCouchBaseDB(this);
+            orderMapArrayList = CouchBaseHelper.getAllDeliveredOrders(database);
+
+            displayDeliveredOrdersInListView(Util.getCurrentDate());
+        }
     }
 }

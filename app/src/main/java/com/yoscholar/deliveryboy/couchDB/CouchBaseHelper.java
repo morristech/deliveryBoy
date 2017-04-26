@@ -8,6 +8,7 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
+import com.yoscholar.deliveryboy.retrofitPojo.syncResponse.SyncResponse;
 import com.yoscholar.deliveryboy.utils.Util;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class CouchBaseHelper {
     //                       |----Wallet
 
     public static final String ACCEPTED_DATE = "accepted_date";
-    private static final String SYNC_STATUS = "sync_status";
+    public static final String SYNC_STATUS = "sync_status";
     private static final String COMMENT = "comment";
     private static final String COMMENT_ID = "comment_id";
 
@@ -341,7 +342,7 @@ public class CouchBaseHelper {
         orderMap.put(PAY_MODE, payMode);
         orderMap.put(SYNC_STATUS, "0");
         orderMap.put(COMMENT, comment);
-        orderMap.put(COMMENT_ID, Util.generateCommentId());
+        //orderMap.put(COMMENT_ID, Util.generateCommentId());
 
         Document document = database.createDocument();
 
@@ -385,7 +386,7 @@ public class CouchBaseHelper {
         orderMap.put(ACTION_DATE, Util.getCurrentDate());
         orderMap.put(SYNC_STATUS, "0");
         orderMap.put(COMMENT, comment);
-        orderMap.put(COMMENT_ID, Util.generateCommentId());
+        //orderMap.put(COMMENT_ID, Util.generateCommentId());
 
         Document document = database.createDocument();
 
@@ -417,8 +418,8 @@ public class CouchBaseHelper {
      */
     public static ArrayList<Map<String, Object>> getAllDeliveredOrders(Database database) {
 
-        Document acceptedOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
-        Map<String, Object> map = acceptedOrdersDocument.getProperties();
+        Document deliveredOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = deliveredOrdersDocument.getProperties();
 
         ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
 
@@ -450,7 +451,7 @@ public class CouchBaseHelper {
                     orderMap.put(PAY_MODE, document.getProperty(PAY_MODE).toString());
                     orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
                     orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
-                    orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
+                    //orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
 
                     orderMapArrayList.add(orderMap);
                 }
@@ -500,7 +501,7 @@ public class CouchBaseHelper {
                     orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
                     orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
                     orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
-                    orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
+                    //orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
 
                     orderMapArrayList.add(orderMap);
                 }
@@ -660,7 +661,7 @@ public class CouchBaseHelper {
                         orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
                         orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
                         orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
-                        orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
+                        //orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
 
                     }
                 }
@@ -668,5 +669,200 @@ public class CouchBaseHelper {
         }
 
         return orderMap;
+    }
+
+    public static ArrayList<Map<String, Object>> getAllUnSyncedDeliveredOrders(Database database) {
+
+
+        Document deliveredOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = deliveredOrdersDocument.getProperties();
+
+        ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
+
+        if (map != null) {
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+                    Document document = database.getDocument(pair.getValue().toString());
+
+                    if (document.getProperties().get(SYNC_STATUS).toString().equalsIgnoreCase("0")) {
+
+                        Map<String, Object> orderMap = new HashMap<>();
+                        orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                        orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                        orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                        orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                        orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                        orderMap.put(CITY, document.getProperty(CITY).toString());
+                        orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                        orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                        orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                        orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                        orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                        orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                        orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
+                        orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
+                        orderMap.put(PAY_MODE, document.getProperty(PAY_MODE).toString());
+                        orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
+                        orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
+                        //orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
+
+                        orderMapArrayList.add(orderMap);
+                    }
+                }
+            }
+        }
+
+        return orderMapArrayList;
+
+    }
+
+    public static boolean updateDeliveredOrdersSyncStatus(Database database, SyncResponse syncResponse) {
+
+        Document acceptedOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = acceptedOrdersDocument.getProperties();
+
+        boolean flag = true;
+
+        if (map != null) {
+
+            Iterator it = map.entrySet().iterator();
+
+            while (it.hasNext()) {
+
+                Map.Entry pair = (Map.Entry) it.next();
+
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+
+                    for (String orderShipId : syncResponse.getOrderShipIds()) {
+
+                        if (orderShipId.equals(pair.getKey().toString())) {
+
+                            Document document = database.getDocument(pair.getValue().toString());
+                            Map<String, Object> map2 = new HashMap<>();
+                            map2.putAll(document.getProperties());
+                            map2.put(SYNC_STATUS, "1");
+
+                            try {
+
+                                document.putProperties(map2);
+
+                            } catch (CouchbaseLiteException e) {
+
+                                flag = false;
+                                Log.e(TAG, "Error while putting : " + e);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return flag;
+
+    }
+
+    public static ArrayList<Map<String, Object>> getAllUnSyncedFailedOrders(Database database) {
+
+        Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = failedOrdersDocument.getProperties();
+
+        ArrayList<Map<String, Object>> orderMapArrayList = new ArrayList<>();
+
+        if (map != null) {
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+                    Document document = database.getDocument(pair.getValue().toString());
+
+                    if (document.getProperties().get(SYNC_STATUS).toString().equalsIgnoreCase("0")) {
+
+                        Map<String, Object> orderMap = new HashMap<>();
+                        orderMap.put(INCREMENT_ID, document.getProperty(INCREMENT_ID).toString());
+                        orderMap.put(ORDER_ID, document.getProperty(ORDER_ID).toString());
+                        orderMap.put(CUSTOMER_NAME, document.getProperty(CUSTOMER_NAME).toString());
+                        orderMap.put(PHONE, document.getProperty(PHONE).toString());
+                        orderMap.put(ADDRESS, document.getProperty(ADDRESS).toString());
+                        orderMap.put(CITY, document.getProperty(CITY).toString());
+                        orderMap.put(PINCODE, document.getProperty(PINCODE).toString());
+                        orderMap.put(METHOD, document.getProperty(METHOD).toString());
+                        orderMap.put(TOTAL, document.getProperty(TOTAL).toString());
+                        orderMap.put(ORDER_TYPE, document.getProperty(ORDER_TYPE).toString());
+                        orderMap.put(ORDER_SHIP_ID, document.getProperty(ORDER_SHIP_ID).toString());
+                        orderMap.put(ACCEPT_STATUS, document.getProperty(ACCEPT_STATUS).toString());
+                        orderMap.put(ACCEPTED_DATE, document.getProperty(ACCEPTED_DATE).toString());
+                        orderMap.put(ACTION_DATE, document.getProperty(ACTION_DATE).toString());
+                        orderMap.put(SYNC_STATUS, document.getProperty(SYNC_STATUS).toString());
+                        orderMap.put(COMMENT, document.getProperty(COMMENT).toString());
+                        //orderMap.put(COMMENT_ID, document.getProperty(COMMENT_ID).toString());
+
+                        orderMapArrayList.add(orderMap);
+                    }
+                }
+            }
+        }
+
+        return orderMapArrayList;
+
+    }
+
+    public static boolean updateFailedOrdersSyncStatus(Database database, SyncResponse syncResponse) {
+
+        Document failedOrdersDocument = database.getDocument(FAILED_ORDERS_DOCUMENT_ID);
+        Map<String, Object> map = failedOrdersDocument.getProperties();
+
+        boolean flag = true;
+
+        if (map != null) {
+
+            Iterator it = map.entrySet().iterator();
+
+            while (it.hasNext()) {
+
+                Map.Entry pair = (Map.Entry) it.next();
+
+                if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                    ;
+                else {
+                    //System.out.println(pair.getKey() + " = " + pair.getValue());
+
+                    for (String orderShipId : syncResponse.getOrderShipIds()) {
+
+                        if (orderShipId.equals(pair.getKey().toString())) {
+
+                            Document document = database.getDocument(pair.getValue().toString());
+                            Map<String, Object> map2 = new HashMap<>();
+                            map2.putAll(document.getProperties());
+                            map2.put(SYNC_STATUS, "1");
+
+                            try {
+
+                                document.putProperties(map2);
+
+                            } catch (CouchbaseLiteException e) {
+
+                                flag = false;
+                                Log.e(TAG, "Error while putting : " + e);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return flag;
     }
 }

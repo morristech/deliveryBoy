@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,12 +18,15 @@ import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.IoniconsIcons;
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
-import com.yoscholar.deliveryboy.service.DeliveredOrdersService;
+import com.yoscholar.deliveryboy.service.DeliveredOrdersSyncService;
+import com.yoscholar.deliveryboy.service.FailedOrdersShipIdsStatusService;
 import com.yoscholar.deliveryboy.utils.AppPreference;
+import com.yoscholar.deliveryboy.utils.Util;
 
 public class OptionsActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 900;
+    private static final String TAG = "OptionsActivity";
     private IconButton acceptOrdersButton;
     private IconButton deliverOrdersButton;
     private IconButton deliveredButton;
@@ -183,6 +187,17 @@ public class OptionsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        startService(new Intent(OptionsActivity.this, DeliveredOrdersService.class));
+        if (Util.isOnline(this)) {
+
+            //start service to sync delivered orders
+            Log.d(TAG, "Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
+            if (!AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING))
+                startService(new Intent(OptionsActivity.this, DeliveredOrdersSyncService.class));
+
+            //start service to check status of ship ids of failed order'
+            Log.d(TAG, "Is failed orders ship ids status service running : " + AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING));
+            if (!AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING))
+                startService(new Intent(OptionsActivity.this, FailedOrdersShipIdsStatusService.class));
+        }
     }
 }

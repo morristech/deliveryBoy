@@ -62,7 +62,15 @@
             android:screenOrientation="portrait"/>
 
         <service
-            android:name=".service.DeliveredOrdersService"
+            android:name=".service.DeliveredOrdersSyncService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".service.FailedOrdersSyncService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".service.FailedOrdersShipIdsStatusService"
             android:exported="false">
         </service>
     </application>

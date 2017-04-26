@@ -6,6 +6,7 @@ import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Status;
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
 import com.yoscholar.deliveryboy.retrofitPojo.reDeliver.ReDeliver;
+import com.yoscholar.deliveryboy.retrofitPojo.syncResponse.SyncResponse;
 import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 
 import java.util.concurrent.TimeUnit;
@@ -108,6 +109,22 @@ public class RetrofitApi {
         Call<Status> getShipIdsStatus(
                 @Field("order_ship_ids") String orderShipIdsJsonArray,
                 @Field("token") String token
+        );
+
+        @FormUrlEncoded
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=syncDeliveredOrders")
+        Call<SyncResponse> syncDeliveredOrders(
+                @Field("db_name") String dbName,
+                @Field("token") String token,
+                @Field("delivered_orders_json") String deliveredOrdersJson
+        );
+
+        @FormUrlEncoded
+        @POST("agrimtool/android/deliveryBoyAPI.php?function=syncFailedOrders")
+        Call<SyncResponse> syncFailedOrders(
+                @Field("db_name") String dbName,
+                @Field("token") String token,
+                @Field("failed_orders_json") String failedOrdersJson
         );
     }
 }

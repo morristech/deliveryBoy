@@ -140,6 +140,18 @@ public class FailedOrdersListViewAdapter extends BaseAdapter {
             }
         });
 
+        IconButton syncIndicator = (IconButton) convertView.findViewById(R.id.sync_indicator);
+        if (orderMapArrayList.get(position).get(CouchBaseHelper.SYNC_STATUS).toString().equals("0")) {
+
+            syncIndicator.setText("{ion-close-circled}");
+
+        } else if (orderMapArrayList.get(position).get(CouchBaseHelper.SYNC_STATUS).toString().equals("1")) {
+
+            syncIndicator.setText("{ion-checkmark-circled}");
+        }
+
+
+
         /*IconButton reDeliver = (IconButton) convertView.findViewById(R.id.redeliver);
         reDeliver.setOnClickListener(new View.OnClickListener() {
             @Override

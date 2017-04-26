@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.joanzapata.iconify.widget.IconTextView;
 import com.yoscholar.deliveryboy.R;
 import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 
@@ -52,6 +53,13 @@ public class DeliveredOrdersListViewAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.delivered_orders_list_item, parent, false);
 
         }
+
+        IconTextView syncIndicator = (IconTextView) convertView.findViewById(R.id.sync_indicator);
+        if (orderMapArrayList.get(position).get(CouchBaseHelper.SYNC_STATUS).toString().equalsIgnoreCase("1"))
+            syncIndicator.setText("{ion-checkmark-circled}");
+
+        else if (orderMapArrayList.get(position).get(CouchBaseHelper.SYNC_STATUS).toString().equalsIgnoreCase("0"))
+            syncIndicator.setText("{ion-close-circled}");
 
         TextView incrementId = (TextView) convertView.findViewById(R.id.increment_id);
         incrementId.setText(orderMapArrayList.get(position).get(CouchBaseHelper.INCREMENT_ID).toString());

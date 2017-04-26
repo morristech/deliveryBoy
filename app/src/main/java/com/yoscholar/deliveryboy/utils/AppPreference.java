@@ -17,6 +17,11 @@ public class AppPreference {
     public static final String CITY = "city";
     public static final String TOKEN = "token";
 
+    public static final String IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING = "is_delivered_orders_sync_service_running";
+    public static final String IS_FAILED_ORDERS_SYNC_SERVICE_RUNNING = "is_failed_orders_sync_service_running";
+    public static final String IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING = "is_failed_orders_ship_ids_status_service_running";
+
+
     public static void saveInt(Context context, String key, int value) {
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
