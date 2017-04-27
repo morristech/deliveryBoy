@@ -5,9 +5,7 @@ import com.yoscholar.deliveryboy.retrofitPojo.acceptAnOrder.AcceptOrder;
 import com.yoscholar.deliveryboy.retrofitPojo.getShipIdsStatus.Status;
 import com.yoscholar.deliveryboy.retrofitPojo.login.Login;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
-import com.yoscholar.deliveryboy.retrofitPojo.reDeliver.ReDeliver;
 import com.yoscholar.deliveryboy.retrofitPojo.syncResponse.SyncResponse;
-import com.yoscholar.deliveryboy.retrofitPojo.updateOrder.UpdateOrder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,13 +24,13 @@ import retrofit2.http.Url;
 
 public class RetrofitApi {
 
-    public static String baseUrl = "http://devcloudpos.yoscholar.com";
+    public static String baseUrl = "http://staging1.schoolsaamaan.website";
     public static Retrofit retrofit;
 
     public static Retrofit getRetrofitInstance() {
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(60 * 1000, TimeUnit.MILLISECONDS)
+                .readTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS)
                 .build();
 
         retrofit = new Retrofit.Builder()
@@ -74,6 +72,7 @@ public class RetrofitApi {
                 @Field("increment_id") String incrementId
         );
 
+/*
         @FormUrlEncoded
         @POST("agrimtool/android/deliveryBoyAPI.php?function=updateOrder")
         Call<UpdateOrder> updateOrder(
@@ -84,6 +83,7 @@ public class RetrofitApi {
                 @Field("db_name") String dbName,
                 @Field("token") String token
         );
+*/
 
         @GET
         Call<ResponseBody> sendMessage(
@@ -95,18 +95,19 @@ public class RetrofitApi {
 
         );
 
-        @FormUrlEncoded
+       /* @FormUrlEncoded
         @POST("agrimtool/android/deliveryBoyAPI.php?function=redeliver")
         Call<ReDeliver> redeliver(
                 @Field("increment_id") String incrementId,
                 @Field("order_ship_id") String orderShipId,
                 @Field("db_name") String dbName,
                 @Field("token") String token
-        );
+        );*/
 
         @FormUrlEncoded
         @POST("agrimtool/android/deliveryBoyAPI.php?function=getShipIdsStatus")
         Call<Status> getShipIdsStatus(
+                @Field("db_name") String dbName,
                 @Field("order_ship_ids") String orderShipIdsJsonArray,
                 @Field("token") String token
         );

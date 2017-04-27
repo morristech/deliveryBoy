@@ -18,6 +18,7 @@ import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.IoniconsIcons;
 import com.joanzapata.iconify.widget.IconButton;
 import com.yoscholar.deliveryboy.R;
+import com.yoscholar.deliveryboy.couchDB.CouchBaseHelper;
 import com.yoscholar.deliveryboy.service.DeliveredOrdersSyncService;
 import com.yoscholar.deliveryboy.service.FailedOrdersShipIdsStatusService;
 import com.yoscholar.deliveryboy.utils.AppPreference;
@@ -189,15 +190,20 @@ public class OptionsActivity extends AppCompatActivity {
 
         if (Util.isOnline(this)) {
 
-            //start service to sync delivered orders
-            Log.d(TAG, "Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
-            if (!AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING))
-                startService(new Intent(OptionsActivity.this, DeliveredOrdersSyncService.class));
+            //to prevent the annoying crash
+            if (CouchBaseHelper.openCouchBaseDB(this) != null) {
 
-            //start service to check status of ship ids of failed order'
-            Log.d(TAG, "Is failed orders ship ids status service running : " + AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING));
-            if (!AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING))
-                startService(new Intent(OptionsActivity.this, FailedOrdersShipIdsStatusService.class));
+                //start service to sync delivered orders
+                Log.d(TAG, "Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
+                if (!AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING))
+                    startService(new Intent(OptionsActivity.this, DeliveredOrdersSyncService.class));
+
+                //start service to check status of ship ids of failed order'
+                Log.d(TAG, "Is failed orders ship ids status service running : " + AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING));
+                if (!AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SHIP_IDS_STATUS_SERVICE_RUNNING))
+                    startService(new Intent(OptionsActivity.this, FailedOrdersShipIdsStatusService.class));
+            }
         }
     }
+
 }

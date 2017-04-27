@@ -671,6 +671,12 @@ public class CouchBaseHelper {
         return orderMap;
     }
 
+    /**
+     * get all not synced delivered orders
+     *
+     * @param database database
+     * @return array list of maps containing orders
+     */
     public static ArrayList<Map<String, Object>> getAllUnSyncedDeliveredOrders(Database database) {
 
 
@@ -721,6 +727,13 @@ public class CouchBaseHelper {
 
     }
 
+    /**
+     * update sync status of delivered orders
+     *
+     * @param database database
+     * @param syncResponse syncResponse
+     * @return
+     */
     public static boolean updateDeliveredOrdersSyncStatus(Database database, SyncResponse syncResponse) {
 
         Document acceptedOrdersDocument = database.getDocument(DELIVERED_ORDERS_DOCUMENT_ID);

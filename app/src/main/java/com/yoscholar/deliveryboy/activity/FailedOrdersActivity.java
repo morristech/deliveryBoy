@@ -138,39 +138,6 @@ public class FailedOrdersActivity extends AppCompatActivity {
         startActivityForResult(intent, MY_REQUEST_CODE);
 
     }
-/*
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onOrderRedelivered(FailedOrderDeleted failedOrderDeleted) {
-
-        if (failedOrderDeleted.isDeleted()) {
-
-            //get new data from db
-            Database database = CouchBaseHelper.openCouchBaseDB(FailedOrdersActivity.this);
-            orderMapArrayList = CouchBaseHelper.getAllFailedOrders(database);
-
-            //refresh the list with new data
-            displayFailedOrdersInListView();
-
-        } else {
-
-            //logout
-            AppPreference.clearPreferencesLogout(FailedOrdersActivity.this);
-
-            //open login screen
-            openLoginScreen();
-
-            finish();
-        }
-
-    }*/
-
-    private void openLoginScreen() {
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-
-    }
 
     //called from FailedOrdersSyncService and FailedOrdersShipIdsStatusService
     @Subscribe(threadMode = ThreadMode.MAIN)

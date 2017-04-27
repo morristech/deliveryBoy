@@ -59,13 +59,13 @@ public class FailedOrdersShipIdsStatusService extends IntentService {
         Log.d(TAG, "Is failed orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SYNC_SERVICE_RUNNING));
         if (!AppPreference.getBoolean(this, AppPreference.IS_FAILED_ORDERS_SYNC_SERVICE_RUNNING))
             startService(new Intent(this, FailedOrdersSyncService.class));
-
     }
 
     public void getShipIdsStatus(JSONArray orderShipIdsJsonArray) {
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
         Call<Status> statusCall = apiInterface.getShipIdsStatus(
+                AppPreference.getString(this, AppPreference.NAME),//db name
                 orderShipIdsJsonArray.toString(),
                 AppPreference.getString(this, AppPreference.TOKEN)//jwt token
         );
