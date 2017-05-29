@@ -11,11 +11,15 @@ import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.retrofitPojo.syncResponse.SyncResponse;
 import com.yoscholar.deliveryboy.utils.Util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 
 /**
  * Created by agrim on 2/11/16.
@@ -730,7 +734,7 @@ public class CouchBaseHelper {
     /**
      * update sync status of delivered orders
      *
-     * @param database database
+     * @param database     database
      * @param syncResponse syncResponse
      * @return
      */

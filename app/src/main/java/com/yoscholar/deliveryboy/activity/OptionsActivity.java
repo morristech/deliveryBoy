@@ -24,9 +24,10 @@ import com.yoscholar.deliveryboy.service.FailedOrdersShipIdsStatusService;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.Util;
 
+
 public class OptionsActivity extends AppCompatActivity {
 
-    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 900;
+    private static final int MY_PERMISSIONS_REQUEST_CODE = 900;
     private static final String TAG = "OptionsActivity";
     private IconButton acceptOrdersButton;
     private IconButton deliverOrdersButton;
@@ -153,8 +154,7 @@ public class OptionsActivity extends AppCompatActivity {
 
     private void requestPermissionToMakePhoneCalls() {
 
-        ActivityCompat.requestPermissions(OptionsActivity.this, new String[]{Manifest.permission.CALL_PHONE},
-                MY_PERMISSIONS_REQUEST_CALL_PHONE);
+        ActivityCompat.requestPermissions(OptionsActivity.this, new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CODE);
 
     }
 
@@ -162,9 +162,9 @@ public class OptionsActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CALL_PHONE: {
+            case MY_PERMISSIONS_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
                     //Toast.makeText(this, "Permission Granted.", Toast.LENGTH_SHORT).show();
 
@@ -194,7 +194,6 @@ public class OptionsActivity extends AppCompatActivity {
             if (CouchBaseHelper.openCouchBaseDB(this) != null) {
 
                 //start service to sync delivered orders
-                Log.d(TAG, "Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
                 if (!AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING))
                     startService(new Intent(OptionsActivity.this, DeliveredOrdersSyncService.class));
 

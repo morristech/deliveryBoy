@@ -20,5 +20,6 @@ public class MyApplication extends Application {
         Iconify.with(new FontAwesomeModule())
                 .with(new IoniconsModule());
 
+
     }
 }
