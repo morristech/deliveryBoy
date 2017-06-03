@@ -13,8 +13,6 @@ import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
 
 import org.greenrobot.eventbus.EventBus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,11 +20,11 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class DeliveredOrdersSyncService extends IntentService {
 
     public static final String TAG = DeliveredOrdersSyncService.class.getSimpleName();
-    private Logger logger = LoggerFactory.getLogger(DeliveredOrdersSyncService.class);
 
 
     public DeliveredOrdersSyncService() {
@@ -37,10 +35,10 @@ public class DeliveredOrdersSyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         Log.d(TAG, "Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
-        logger.debug("Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
+        Timber.d("Is delivered orders sync service running : " + AppPreference.getBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING));
 
         Log.d(TAG, "DeliveredOrdersSyncService started.........");
-        logger.debug("DeliveredOrdersSyncService started.........");
+        Timber.d("DeliveredOrdersSyncService started.........");
         AppPreference.saveBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING, true);
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
@@ -54,7 +52,7 @@ public class DeliveredOrdersSyncService extends IntentService {
         } catch (Exception e) {
 
             Log.d(TAG, "Exception caught while getting unsynced orders : " + e);
-            logger.debug("Exception caught while getting unsynced orders : " + e);
+            Timber.d("Exception caught while getting unsynced orders : " + e);
 
         }
 
@@ -70,16 +68,16 @@ public class DeliveredOrdersSyncService extends IntentService {
             } catch (Exception e) {
 
                 Log.d(TAG, "Exception caught while converting to json: " + e);
-                logger.debug("Exception caught while converting to json: " + e);
+                Timber.d("Exception caught while converting to json: " + e);
 
             }
 
         } else {
 
             Log.d(TAG, "No delivered orders to sync.");
-            logger.debug("No delivered orders to sync.");
+            Timber.d("No delivered orders to sync.");
             Log.d(TAG, "DeliveredOrdersSyncService stopped.........");
-            logger.debug("DeliveredOrdersSyncService stopped.........");
+            Timber.d("DeliveredOrdersSyncService stopped.........");
             AppPreference.saveBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING, false);
 
         }
@@ -110,26 +108,26 @@ public class DeliveredOrdersSyncService extends IntentService {
                     if (flag) {
 
                         Log.d(TAG, "Orders synced and updated.");
-                        logger.debug("Orders synced and updated.");
+                        Timber.d("Orders synced and updated.");
 
                         EventBus.getDefault().post(new DeliveredOrdersUpdated(true));
 
                     } else {
 
                         Log.d(TAG, "Orders synced and but couldn't be updated.");
-                        logger.debug("Orders synced and but couldn't be updated.");
+                        Timber.d("Orders synced and but couldn't be updated.");
 
                     }
 
                 } else if (syncResponse.getStatus().equalsIgnoreCase("failure")) {
 
                     Log.d(TAG, syncResponse.getMessage());
-                    logger.debug(syncResponse.getMessage());
+                    Timber.d(syncResponse.getMessage());
 
                 }
 
                 Log.d(TAG, "DeliveredOrdersSyncService stopped.........");
-                logger.debug("DeliveredOrdersSyncService stopped.........");
+                Timber.d("DeliveredOrdersSyncService stopped.........");
                 AppPreference.saveBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING, false);
 
             }
@@ -137,12 +135,12 @@ public class DeliveredOrdersSyncService extends IntentService {
         } catch (IOException e) {
 
             Log.e(TAG, "Error while syncing delivered orders : " + e);
-            logger.error("Error while syncing delivered orders : " + e);
+            Timber.e("Error while syncing delivered orders : " + e);
 
         } finally {
 
             Log.d(TAG, "DeliveredOrdersSyncService stopped.........");
-            logger.debug("DeliveredOrdersSyncService stopped.........");
+            Timber.d("DeliveredOrdersSyncService stopped.........");
             AppPreference.saveBoolean(this, AppPreference.IS_DELIVERED_ORDERS_SYNC_SERVICE_RUNNING, false);
 
         }

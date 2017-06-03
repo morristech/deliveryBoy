@@ -11,9 +11,6 @@ import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.Orderdatum;
 import com.yoscholar.deliveryboy.retrofitPojo.syncResponse.SyncResponse;
 import com.yoscholar.deliveryboy.utils.Util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
