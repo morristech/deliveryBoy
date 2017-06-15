@@ -1,12 +1,15 @@
 package com.yoscholar.deliveryboy.activity;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -16,16 +19,21 @@ import com.yoscholar.deliveryboy.pojo.OrderAccepted;
 import com.yoscholar.deliveryboy.retrofitPojo.ordersToAccept.AcceptOrders;
 import com.yoscholar.deliveryboy.utils.AppPreference;
 import com.yoscholar.deliveryboy.utils.RetrofitApi;
+import com.yoscholar.deliveryboy.utils.Util;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AcceptOrdersActivity extends AppCompatActivity {
+public class AcceptOrdersActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String TAG = AcceptOrdersActivity.class.getSimpleName();
     private Toolbar toolbar;
@@ -34,6 +42,14 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private DatePickerDialog datePickerDialog;
+    private Calendar calendar = Calendar.getInstance();
+    private int year = calendar.get(Calendar.YEAR);
+    private int month = calendar.get(Calendar.MONTH);
+    private int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+    private Menu menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +57,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
         init();
 
-        getOrdersToAccept();
+        getOrdersToAccept(Util.dateForApi(calendar.getTime()));
     }
 
     private void init() {
@@ -50,6 +66,10 @@ public class AcceptOrdersActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        datePickerDialog = new DatePickerDialog(this, this, year, month, day);
+        datePickerDialog.setCanceledOnTouchOutside(false);
+        datePickerDialog.setCancelable(false);
+
         acceptOrdersListView = (ListView) findViewById(R.id.orders_list_to_accept);
 
         progressDialog = new ProgressDialog(AcceptOrdersActivity.this);
@@ -57,10 +77,11 @@ public class AcceptOrdersActivity extends AppCompatActivity {
         progressDialog.setMessage("Please wait....");
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
     }
 
-    private void getOrdersToAccept() {
+    private void getOrdersToAccept(String date) {
+
+        progressDialog.show();
 
         Log.d(TAG, "Requesting");
 
@@ -68,7 +89,8 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
         Call<AcceptOrders> acceptOrdersCall = apiInterface.ordersToAccept(
                 AppPreference.getString(AcceptOrdersActivity.this, AppPreference.NAME),//db name
-                AppPreference.getString(AcceptOrdersActivity.this, AppPreference.TOKEN)//jwt token
+                AppPreference.getString(AcceptOrdersActivity.this, AppPreference.TOKEN),//jwt token
+                date
         );
 
         acceptOrdersCall.enqueue(new Callback<AcceptOrders>() {
@@ -96,6 +118,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
                 progressDialog.dismiss();
                 Toast.makeText(AcceptOrdersActivity.this, "Network problem", Toast.LENGTH_SHORT).show();
                 //Log.d("VICKY", call.request().url().toString());
+                //Log.d(TAG, t.toString());
 
             }
         });
@@ -105,7 +128,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
         if (acceptOrders.getStatus().equalsIgnoreCase("success")) {
 
-            //Toast.makeText(AcceptOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(AcceptOrdersActivity.this, acceptOrders.getMessage(), Toast.LENGTH_SHORT).show();
 
             acceptOrdersListViewAdapter = new AcceptOrdersListViewAdapter(AcceptOrdersActivity.this, acceptOrders);
 
@@ -135,12 +158,26 @@ public class AcceptOrdersActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_accept_orders_activity, menu);
+
+        this.menu = menu;
+        menu.findItem(R.id.date_picker).setTitle(Util.getCurrentDate());
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
 
             case android.R.id.home:
                 finish();
+                return true;
+
+            case R.id.date_picker:
+                datePickerDialog.show();
                 return true;
 
             default:
@@ -168,7 +205,7 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
             progressDialog.show();
 
-            getOrdersToAccept();
+            getOrdersToAccept(Util.dateForApi(calendar.getTime()));
 
         } else {
 
@@ -180,5 +217,19 @@ public class AcceptOrdersActivity extends AppCompatActivity {
 
             finish();
         }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        calendar.set(year, month, dayOfMonth);
+
+        SimpleDateFormat format = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
+        String date = format.format(calendar.getTime());
+
+        menu.findItem(R.id.date_picker).setTitle(date);
+
+        Toast.makeText(this, "Api Date : " + Util.dateForApi(calendar.getTime()), Toast.LENGTH_SHORT).show();
+
+        getOrdersToAccept(Util.dateForApi(calendar.getTime()));
     }
 }

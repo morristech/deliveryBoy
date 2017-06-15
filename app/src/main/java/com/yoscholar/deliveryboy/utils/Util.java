@@ -62,16 +62,9 @@ public class Util {
         return df.format(calendar.getTime());
     }
 
-    public static String getCurrentDateAndTime2() {
-        //getting current date and time using Date class
-        DateFormat df = new SimpleDateFormat("d MMM yyyy KK:mm:ss a", Locale.ENGLISH);
-        Date date = new Date();
-        System.out.println(df.format(date));
-
-       /*getting current date time using calendar class
-        * An Alternative of above*/
-        Calendar calendar = Calendar.getInstance();
-        return df.format(calendar.getTime());
+    public static String dateForApi(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        return format.format(date);
     }
 
     public static boolean isOnline(Context context) {

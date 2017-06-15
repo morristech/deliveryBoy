@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
         passwordEditText = (EditText) findViewById(R.id.password);
 
         //dev
-        userNameEditText.setText("bang1");
+        userNameEditText.setText("Sandeep");
         passwordEditText.setText("bang1$23");
 
         loginButton = (Button) findViewById(R.id.login_button);
