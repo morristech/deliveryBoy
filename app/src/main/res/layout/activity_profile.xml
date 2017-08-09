@@ -22,6 +22,7 @@
 
             <ImageView
                 android:id="@+id/gif"
+                android:src="@drawable/delivery_boy"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="#FFF8AA"/>

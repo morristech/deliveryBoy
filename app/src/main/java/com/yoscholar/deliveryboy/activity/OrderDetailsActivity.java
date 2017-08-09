@@ -84,7 +84,6 @@ public class OrderDetailsActivity extends AppCompatActivity implements DatePicke
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getIntent().getStringExtra(DeliverOrdersActivity.INCREMENT_ID));
 
         orderContainer = (FrameLayout) findViewById(R.id.order_container);
